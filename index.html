@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111418">
+<title>Billigste opladning nu</title>
+<style>
+  :root{--bg:#111418;--card:#1b2027;--line:#2a313b;--txt:#e8ecf1;--dim:#8c97a6;--win:#3ecf8e;--lose:#e5a54b;--err:#ff6b6b}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:16px;max-width:520px;margin-inline:auto}
+  h1{font-size:18px;font-weight:600;margin:4px 0 14px;color:var(--dim)}
+  .hero{background:var(--card);border-radius:16px;padding:18px;margin-bottom:12px;border:1px solid var(--line)}
+  .hero .lbl{color:var(--dim);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+  .hero .name{font-size:28px;font-weight:700;margin:4px 0}
+  .hero .sub{color:var(--dim);font-size:14px}
+  .opt{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:10px;border:2px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .opt.best{border-color:var(--win)}
+  .opt .t{font-weight:600}
+  .opt .d{color:var(--dim);font-size:13px}
+  .opt .p{font-size:24px;font-weight:700;white-space:nowrap;text-align:right}
+  .opt .p small{display:block;font-size:12px;font-weight:400;color:var(--dim)}
+  .warn{color:var(--lose);font-size:13px;margin-top:6px}
+  .err{color:var(--err);font-size:14px;white-space:pre-wrap}
+  details{background:var(--card);border-radius:14px;padding:12px 16px;border:1px solid var(--line);margin-top:12px}
+  summary{cursor:pointer;color:var(--dim)}
+  label{display:block;margin:12px 0 4px;font-size:14px;color:var(--dim)}
+  input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0d1014;color:var(--txt);font-size:16px}
+  button{margin-top:14px;padding:12px 16px;border-radius:10px;border:0;background:#2d6cdf;color:#fff;font-size:16px;width:100%}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+  td{padding:4px 0;border-bottom:1px solid var(--line)}
+  td:last-child{text-align:right}
+  footer{color:var(--dim);font-size:12px;margin-top:16px;text-align:center}
+  a{color:#7fb0ff}
+</style>
+</head>
+<body>
+<h1>Billigste opladning · næste time</h1>
+
+<div class="hero" id="hero"><div class="lbl">Henter…</div></div>
+<div id="opts"></div>
+<div id="errs" class="err"></div>
+
+<details id="detailsHome"><summary>Hjemmepris – kvarterer i timen</summary><table id="qt"></table></details>
+
+<details><summary>Indstillinger</summary>
+  <label>Tesla-pris (kr/kWh, inkl. moms)</label>
+  <input id="sTesla" type="number" step="0.01" inputmode="decimal">
+  <label>Hjemmelader effekt (kW) – til "kr for en times ladning"</label>
+  <input id="sKw" type="number" step="0.1" inputmode="decimal">
+  <label>Netselskab-søgning (hjemmeadresse, lat,lon)</label>
+  <input id="sHome" type="text">
+  <label>Elprodukt (regex på "Selskab - Produkt")</label>
+  <input id="sProd" type="text">
+  <button id="save">Gem og opdatér</button>
+</details>
+
+<footer>Hjemmepris: <a href="https://stromligning.dk" target="_blank" rel="noopener">Strømligning</a> · Ladere: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>-bidragydere<br><span id="upd"></span></footer>
+
+<script>
+"use strict";
+const SL = "https://stromligning.dk/api";
+const OVERPASS = "https://overpass-api.de/api/interpreter";
+const DEF = {
+  tesla: 2.60,           // Fast DK-pris for Tesla-ejere/abonnenter (indført maj 2026). Ikke-medlem: 3,60
+  kw: 11,
+  home: "56.1387,9.1577", // Ikast – bruges kun til at finde netselskabet
+  prod: "vindst.*elforbundet.*2026"
+};
+function loadS(){ try{ return Object.assign({},DEF,JSON.parse(localStorage.getItem("ladepris")||"{}")); }catch{ return {...DEF}; } }
+function saveS(s){ try{ localStorage.setItem("ladepris",JSON.stringify(s)); }catch{} }
+let S = loadS();
+
+const $ = id => document.getElementById(id);
+const kr = v => v.toLocaleString("da-DK",{minimumFractionDigits:2,maximumFractionDigits:2});
+const errs = [];
+function err(m){ errs.push(m); $("errs").textContent = errs.join("\n"); }
+
+async function getJSON(url, opt){
+  const r = await fetch(url, opt);
+  if(!r.ok) throw new Error(`HTTP ${r.status} fra ${new URL(url).host}`);
+  return r.json();
+}
+
+/* ---------- GPS ---------- */
+function gps(){
+  return new Promise((res,rej)=>{
+    if(!navigator.geolocation) return rej(new Error("Browseren har ingen GPS-adgang"));
+    navigator.geolocation.getCurrentPosition(
+      p=>res({lat:p.coords.latitude,lon:p.coords.longitude}),
+      e=>rej(new Error("GPS: "+e.message+(location.protocol!=="https:"&&location.hostname!=="localhost"?" (kræver https)":""))),
+      {enableHighAccuracy:false,timeout:15000,maximumAge:60000});
+  });
+}
+function distKm(a,b){
+  const R=6371,r=x=>x*Math.PI/180,dLat=r(b.lat-a.lat),dLon=r(b.lon-a.lon);
+  const h=Math.sin(dLat/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+
+/* ---------- Nærmeste Tesla Supercharger (OpenStreetMap) ---------- */
+async function nearestTesla(pos){
+  const q = `[out:json][timeout:25];
+(nwr["amenity"="charging_station"]["brand"~"Tesla",i](around:150000,${pos.lat},${pos.lon});
+ nwr["amenity"="charging_station"]["operator"~"Tesla",i](around:150000,${pos.lat},${pos.lon}););
+out center tags;`;
+  const d = await getJSON(OVERPASS,{method:"POST",body:"data="+encodeURIComponent(q),
+    headers:{"Content-Type":"application/x-www-form-urlencoded"}});
+  const sites = d.elements.map(e=>{
+    const t=e.tags||{}, c=e.center||e;
+    return {name:t.name||t["name:da"]||"Tesla Supercharger", lat:c.lat, lon:c.lon, tags:t};
+  }).filter(s=>{
+    const all=(s.name+" "+(s.tags.brand||"")+" "+(s.tags.network||"")).toLowerCase();
+    return s.lat && !all.includes("destination");          // kun Superchargere
+  });
+  if(!sites.length) throw new Error("Ingen Tesla Supercharger fundet inden for 150 km");
+  sites.forEach(s=>s.km=distKm(pos,s));
+  sites.sort((a,b)=>a.km-b.km);
+  return sites[0];
+}
+
+/* ---------- Hjemmepris (Strømligning) ---------- */
+let ids = null;
+async function resolveIds(){
+  if(ids) return ids;
+  const [hl,hn] = S.home.split(",").map(Number);
+  const sup = (await getJSON(`${SL}/suppliers/find?lat=${hl}&long=${hn}`))[0];
+  if(!sup) throw new Error("Strømligning fandt intet netselskab for hjemmeadressen");
+  const comps = await getJSON(`${SL}/companies?region=${sup.priceArea}`);
+  const re = new RegExp(S.prod,"i");
+  let prod=null;
+  for(const c of comps) for(const p of c.products||[]){
+    const n=`${c.name} - ${p.name}`;
+    if(re.test(n)){ prod={id:p.id,name:n,type:p.productType}; break; }
+  }
+  if(!prod) throw new Error(`Intet elprodukt matcher /${S.prod}/ i ${sup.priceArea}`);
+  if(prod.type==="fixed") throw new Error(`${prod.name} er et fastprisprodukt – understøttes ikke`);
+  ids = {supId:sup.id, supName:sup.name||sup.id, area:sup.priceArea, prodId:prod.id, prodName:prod.name};
+  return ids;
+}
+
+async function homeHour(){
+  const i = await resolveIds();
+  const now = new Date();
+  const from = new Date(now); from.setMinutes(Math.floor(now.getMinutes()/15)*15,0,0);
+  const to = new Date(now.getTime()+75*60000);
+  const url = `${SL}/prices?productId=${encodeURIComponent(i.prodId)}&supplierId=${encodeURIComponent(i.supId)}`+
+              `&from=${from.toISOString()}&to=${to.toISOString()}&forecast=false`;
+  const d = await getJSON(url);
+  const list = (d.prices||[]).map(p=>({t:new Date(p.date), v:p.price.total}))
+                             .sort((a,b)=>a.t-b.t);
+  if(!list.length) throw new Error("Strømligning returnerede ingen priser for perioden");
+  // Varighed pr. post udledes af afstanden til næste post (15 min eller 60 min)
+  const dflt = list.length>1 ? list[1].t-list[0].t : 3600000;
+  const winA = now.getTime(), winB = winA+3600000;
+  let sum=0, cov=0; const rows=[];
+  list.forEach((p,k)=>{
+    const a=p.t.getTime(), b=a+(list[k+1]?list[k+1].t-p.t:dflt);
+    const ov=Math.max(0,Math.min(b,winB)-Math.max(a,winA));
+    if(ov>0){ sum+=p.v*ov; cov+=ov; rows.push({t:p.t,v:p.v,min:ov/60000}); }
+  });
+  if(cov<3600000-1000) err(`Advarsel: hjemmeprisen dækker kun ${Math.round(cov/60000)} af 60 min`);
+  if(!cov) throw new Error("Ingen hjemmepriser dækker den kommende time");
+  return {avg:sum/cov, rows, ...i};
+}
+
+/* ---------- Render ---------- */
+function render(home, tesla, pos){
+  const opts=[];
+  if(home) opts.push({key:"home",t:"Hjemme",d:home.prodName+" · "+home.supName,p:home.avg});
+  if(tesla) opts.push({key:"tesla",t:tesla.name,d:`${kr(tesla.km)} km væk · Tesla Supercharger`,p:S.tesla,
+                       warn:"Tesla har ingen åben pris-API – prisen er din indstilling. Tjek i Tesla-appen."});
+  opts.sort((a,b)=>a.p-b.p);
+  const best=opts[0];
+  if(best){
+    const diff = opts[1] ? opts[1].p-best.p : null;
+    $("hero").innerHTML = `<div class="lbl">Billigst lige nu</div><div class="name">${best.t}</div>
+      <div class="sub">${kr(best.p)} kr/kWh i snit over næste time${diff!=null?` · ${kr(diff)} kr/kWh billigere`:""}</div>`;
+  }
+  const kwh = S.kw*1;
+  $("opts").innerHTML = opts.map(o=>`<div class="opt ${o===best?"best":""}">
+     <div><div class="t">${o.t}</div><div class="d">${o.d}</div>${o.warn?`<div class="warn">${o.warn}</div>`:""}</div>
+     <div class="p">${kr(o.p)}<small>kr/kWh · ${kr(o.p*kwh)} kr for ${kr(kwh)} kWh</small></div></div>`).join("");
+  if(home) $("qt").innerHTML = home.rows.map(r=>`<tr><td>${r.t.toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"})}
+     (${Math.round(r.min)} min)</td><td>${kr(r.v)} kr/kWh</td></tr>`).join("");
+  $("upd").textContent = "Opdateret "+new Date().toLocaleTimeString("da-DK")+(pos?` · GPS ${pos.lat.toFixed(4)}, ${pos.lon.toFixed(4)}`:"");
+}
+
+async function run(){
+  errs.length=0; $("errs").textContent="";
+  const homeP = homeHour().catch(e=>{err("Hjemmepris: "+e.message+(e instanceof TypeError?" (netværk/CORS blokeret)":"")); return null;});
+  const posP = gps().catch(e=>{err(e.message); return null;});
+  const pos = await posP;
+  const tesla = pos ? await nearestTesla(pos).catch(e=>{err("Tesla-lader: "+e.message); return null;}) : null;
+  const home = await homeP;
+  if(!home && !tesla){ $("hero").innerHTML=`<div class="lbl">Ingen data</div>`; return; }
+  render(home, tesla, pos);
+}
+
+/* ---------- Indstillinger ---------- */
+$("sTesla").value=S.tesla; $("sKw").value=S.kw; $("sHome").value=S.home; $("sProd").value=S.prod;
+$("save").onclick=()=>{
+  S={tesla:parseFloat($("sTesla").value)||DEF.tesla, kw:parseFloat($("sKw").value)||DEF.kw,
+     home:$("sHome").value.trim()||DEF.home, prod:$("sProd").value.trim()||DEF.prod};
+  saveS(S); ids=null; run();
+};
+
+run();
+setInterval(run, 5*60000);
+</script>
+</body>
+</html>
