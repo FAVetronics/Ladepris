@@ -60,7 +60,12 @@
 <script>
 "use strict";
 const SL = "https://stromligning.dk/api";
-const OVERPASS = "https://overpass-api.de/api/interpreter";
+// Offentlige Overpass-instanser (OSM-wiki), prøves i rækkefølge
+const OVERPASS_EPS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
+];
 const DEF = {
   tesla: 2.60,           // Fast DK-pris for Tesla-ejere/abonnenter (indført maj 2026). Ikke-medlem: 3,60
   kw: 11,
@@ -99,13 +104,39 @@ function distKm(a,b){
 }
 
 /* ---------- Nærmeste Tesla Supercharger (OpenStreetMap) ---------- */
-async function nearestTesla(pos){
+// Lokationer ændrer sig sjældent: cache resultatet og genbrug det, så længe vi er
+// under 25 km fra det sted, forespørgslen blev lavet (radius 150 km giver rigelig margin).
+async function overpassQuery(pos){
   const q = `[out:json][timeout:25];
 (nwr["amenity"="charging_station"]["brand"~"Tesla",i](around:150000,${pos.lat},${pos.lon});
  nwr["amenity"="charging_station"]["operator"~"Tesla",i](around:150000,${pos.lat},${pos.lon}););
 out center tags;`;
-  const d = await getJSON(OVERPASS,{method:"POST",body:"data="+encodeURIComponent(q),
-    headers:{"Content-Type":"application/x-www-form-urlencoded"}});
+  const tried=[];
+  for(const ep of OVERPASS_EPS){
+    const ac=new AbortController(), to=setTimeout(()=>ac.abort(),20000);
+    try{
+      const d = await getJSON(ep,{method:"POST",body:"data="+encodeURIComponent(q),signal:ac.signal,
+        headers:{"Content-Type":"application/x-www-form-urlencoded"}});
+      if(!Array.isArray(d.elements)) throw new Error("uventet svar");
+      return d;
+    }catch(e){ tried.push(`${new URL(ep).host}: ${e.name==="AbortError"?"timeout":e.message}`); }
+    finally{ clearTimeout(to); }
+  }
+  throw new Error("alle Overpass-servere fejlede – "+tried.join("; "));
+}
+async function nearestTesla(pos){
+  let cache=null; try{ cache=JSON.parse(localStorage.getItem("ladepris_osm")||"null"); }catch{}
+  let d;
+  if(cache && distKm(pos,cache.c)<25 && Date.now()-cache.t<7*864e5){ d=cache.d; }
+  else{
+    try{
+      d = await overpassQuery(pos);
+      try{ localStorage.setItem("ladepris_osm",JSON.stringify({c:pos,t:Date.now(),d})); }catch{}
+    }catch(e){
+      if(cache && distKm(pos,cache.c)<100){ d=cache.d; err("Tesla-lader: bruger gemt liste ("+e.message+")"); }
+      else throw e;
+    }
+  }
   const sites = d.elements.map(e=>{
     const t=e.tags||{}, c=e.center||e;
     return {name:t.name||t["name:da"]||"Tesla Supercharger", lat:c.lat, lon:c.lon, tags:t};
