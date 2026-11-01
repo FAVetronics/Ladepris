@@ -30,6 +30,7 @@
   table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
   td{padding:4px 0;border-bottom:1px solid var(--line)}
   td:last-child{text-align:right}
+  .log{color:var(--dim);font:12px/1.5 ui-monospace,monospace;white-space:pre-wrap;margin-top:8px}
   footer{color:var(--dim);font-size:12px;margin-top:16px;text-align:center}
   a{color:#7fb0ff}
 </style>
@@ -40,6 +41,7 @@
 <div class="hero" id="hero"><div class="lbl">Henter…</div></div>
 <div id="opts"></div>
 <div id="errs" class="err"></div>
+<div id="log" class="log"></div>
 
 <details id="detailsHome"><summary>Hjemmepris – kvarterer i timen</summary><table id="qt"></table></details>
 
@@ -81,10 +83,24 @@ const kr = v => v.toLocaleString("da-DK",{minimumFractionDigits:2,maximumFractio
 const errs = [];
 function err(m){ errs.push(m); $("errs").textContent = errs.join("\n"); }
 
-async function getJSON(url, opt){
-  const r = await fetch(url, opt);
-  if(!r.ok) throw new Error(`HTTP ${r.status} fra ${new URL(url).host}`);
-  return r.json();
+// Statuslog med tid siden start – viser hvilket trin der venter
+let t0 = performance.now();
+function log(m){ const el=$("log"); el.textContent += `${((performance.now()-t0)/1000).toFixed(1).padStart(5)} s  ${m}\n`; }
+
+async function getJSON(url, opt={}, ms=20000){
+  const host = new URL(url).host, ac = new AbortController(), to = setTimeout(()=>ac.abort(), ms);
+  log(`→ ${host}${new URL(url).pathname}`);
+  try{
+    const r = await fetch(url, {...opt, signal:ac.signal});
+    if(!r.ok) throw new Error(`HTTP ${r.status} fra ${host}`);
+    const j = await r.json();
+    log(`← ${host} OK`);
+    return j;
+  }catch(e){
+    const m = e.name==="AbortError" ? `timeout efter ${ms/1000} s fra ${host}` : e.message;
+    log(`✗ ${host}: ${m}`);
+    throw new Error(m);
+  }finally{ clearTimeout(to); }
 }
 
 /* ---------- GPS ---------- */
@@ -92,7 +108,7 @@ function gps(){
   return new Promise((res,rej)=>{
     if(!navigator.geolocation) return rej(new Error("Browseren har ingen GPS-adgang"));
     navigator.geolocation.getCurrentPosition(
-      p=>res({lat:p.coords.latitude,lon:p.coords.longitude}),
+      p=>res({lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}),
       e=>rej(new Error("GPS: "+e.message+(location.protocol!=="https:"&&location.hostname!=="localhost"?" (kræver https)":""))),
       {enableHighAccuracy:false,timeout:15000,maximumAge:60000});
   });
@@ -113,21 +129,19 @@ async function overpassQuery(pos){
 out center tags;`;
   const tried=[];
   for(const ep of OVERPASS_EPS){
-    const ac=new AbortController(), to=setTimeout(()=>ac.abort(),20000);
     try{
-      const d = await getJSON(ep,{method:"POST",body:"data="+encodeURIComponent(q),signal:ac.signal,
+      const d = await getJSON(ep,{method:"POST",body:"data="+encodeURIComponent(q),
         headers:{"Content-Type":"application/x-www-form-urlencoded"}});
       if(!Array.isArray(d.elements)) throw new Error("uventet svar");
       return d;
-    }catch(e){ tried.push(`${new URL(ep).host}: ${e.name==="AbortError"?"timeout":e.message}`); }
-    finally{ clearTimeout(to); }
+    }catch(e){ tried.push(e.message); }
   }
   throw new Error("alle Overpass-servere fejlede – "+tried.join("; "));
 }
 async function nearestTesla(pos){
   let cache=null; try{ cache=JSON.parse(localStorage.getItem("ladepris_osm")||"null"); }catch{}
   let d;
-  if(cache && distKm(pos,cache.c)<25 && Date.now()-cache.t<7*864e5){ d=cache.d; }
+  if(cache && distKm(pos,cache.c)<25 && Date.now()-cache.t<7*864e5){ d=cache.d; log("Tesla-lader: gemt liste brugt"); }
   else{
     try{
       d = await overpassQuery(pos);
@@ -205,7 +219,7 @@ function render(home, tesla, pos){
   const best=opts[0];
   if(best){
     const diff = opts[1] ? opts[1].p-best.p : null;
-    $("hero").innerHTML = `<div class="lbl">Billigst lige nu</div><div class="name">${best.t}</div>
+    $("hero").innerHTML = `<div class="lbl">${opts.length>1?"Billigst lige nu":"Kun "+(home?"hjemmepris":"Tesla-pris")+" indtil videre"}</div><div class="name">${best.t}</div>
       <div class="sub">${kr(best.p)} kr/kWh i snit over næste time${diff!=null?` · ${kr(diff)} kr/kWh billigere`:""}</div>`;
   }
   const kwh = S.kw*1;
@@ -217,15 +231,20 @@ function render(home, tesla, pos){
   $("upd").textContent = "Opdateret "+new Date().toLocaleTimeString("da-DK")+(pos?` · GPS ${pos.lat.toFixed(4)}, ${pos.lon.toFixed(4)}`:"");
 }
 
+// Hjemmepris og Tesla hentes uafhængigt; skærmen opdateres så snart én af dem er klar
 async function run(){
-  errs.length=0; $("errs").textContent="";
-  const homeP = homeHour().catch(e=>{err("Hjemmepris: "+e.message+(e instanceof TypeError?" (netværk/CORS blokeret)":"")); return null;});
-  const posP = gps().catch(e=>{err(e.message); return null;});
-  const pos = await posP;
-  const tesla = pos ? await nearestTesla(pos).catch(e=>{err("Tesla-lader: "+e.message); return null;}) : null;
-  const home = await homeP;
-  if(!home && !tesla){ $("hero").innerHTML=`<div class="lbl">Ingen data</div>`; return; }
-  render(home, tesla, pos);
+  errs.length=0; $("errs").textContent=""; $("log").textContent=""; t0=performance.now();
+  let home=null, tesla=null, pos=null;
+  const show=()=>{ if(home||tesla) render(home,tesla,pos); };
+  const homeP = homeHour().then(h=>{home=h; log("Hjemmepris klar"); show();})
+    .catch(e=>err("Hjemmepris: "+e.message+(e instanceof TypeError?" (netværk/CORS blokeret)":"")));
+  log("GPS: venter på position…");
+  const teslaP = gps().then(p=>{ pos=p; log(`GPS OK (±${Math.round(p.acc)} m)`); return nearestTesla(p); })
+    .then(t=>{tesla=t; log("Tesla-lader klar: "+t.name); show();})
+    .catch(e=>err((pos?"Tesla-lader: ":"")+e.message));
+  await Promise.all([homeP,teslaP]);
+  if(!home && !tesla) $("hero").innerHTML=`<div class="lbl">Ingen data</div>`;
+  log("Færdig");
 }
 
 /* ---------- Indstillinger ---------- */
