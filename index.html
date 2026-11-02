@@ -46,10 +46,8 @@
 <details id="detailsHome"><summary>Hjemmepris – kvarterer i timen</summary><table id="qt"></table></details>
 
 <details><summary>Indstillinger</summary>
-  <label>Tesla-pris (kr/kWh, inkl. moms)</label>
-  <input id="sTesla" type="number" step="0.01" inputmode="decimal">
-  <label>Hjemmelader effekt (kW) – til "kr for en times ladning"</label>
-  <input id="sKw" type="number" step="0.1" inputmode="decimal">
+  <label>Tesla-pris aflæst i Tesla-appen (kr/kWh, inkl. moms)</label>
+  <input id="sTesla" type="number" step="0.01" inputmode="decimal" placeholder="ikke indtastet">
   <label>Netselskab-søgning (hjemmeadresse, lat,lon)</label>
   <input id="sHome" type="text">
   <label>Elprodukt (regex på "Selskab - Produkt")</label>
@@ -64,12 +62,19 @@
 const SL = "https://stromligning.dk/api";
 const SITES_URL = "./superchargers.json";   // bygges dagligt af GitHub Actions fra supercharge.info
 const DEF = {
-  tesla: 2.60,           // Fast DK-pris for Tesla-ejere/abonnenter (indført maj 2026). Ikke-medlem: 3,60
-  kw: 11,
+  tesla: null,           // Ingen standard: Tesla har ingen åben pris-API, så prisen skal indtastes fra Tesla-appen
+  teslaSet: null,        // tidspunkt for indtastning
   home: "56.1387,9.1577", // Ikast – bruges kun til at finde netselskabet
   prod: "vindst.*elforbundet.*2026"
 };
-function loadS(){ try{ return Object.assign({},DEF,JSON.parse(localStorage.getItem("ladepris")||"{}")); }catch{ return {...DEF}; } }
+function loadS(){
+  try{
+    const o=JSON.parse(localStorage.getItem("ladepris")||"{}");
+    if(!o.teslaSet){ delete o.tesla; }   // pris uden indtastningstidspunkt stammer fra min gamle standard
+    delete o.kw;
+    return Object.assign({},DEF,o);
+  }catch{ return {...DEF}; }
+}
 function saveS(s){ try{ localStorage.setItem("ladepris",JSON.stringify(s)); }catch{} }
 let S = loadS();
 
@@ -178,18 +183,21 @@ function render(home, tesla, pos){
   const opts=[];
   if(home) opts.push({key:"home",t:"Hjemme",d:home.prodName+" · "+home.supName,p:home.avg});
   if(tesla) opts.push({key:"tesla",t:tesla.name,d:`${kr(tesla.km)} km væk · ${tesla.stalls??"?"} ladere`,p:S.tesla,
-                       warn:"Tesla har ingen åben pris-API – prisen er din indstilling. Tjek i Tesla-appen."});
-  opts.sort((a,b)=>a.p-b.p);
-  const best=opts[0];
+                       warn: S.tesla==null ? "Pris ikke indtastet – aflæs den i Tesla-appen og skriv den under Indstillinger."
+                           : `Pris indtastet af dig ${new Date(S.teslaSet).toLocaleString("da-DK",{day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"})} – ikke hentet automatisk.`});
+  const priced = opts.filter(o=>o.p!=null).sort((a,b)=>a.p-b.p);
+  opts.sort((a,b)=>(a.p??Infinity)-(b.p??Infinity));
+  const best = priced.length>1 ? priced[0] : null;
   if(best){
-    const diff = opts[1] ? opts[1].p-best.p : null;
-    $("hero").innerHTML = `<div class="lbl">${opts.length>1?"Billigst lige nu":"Kun "+(home?"hjemmepris":"Tesla-pris")+" indtil videre"}</div><div class="name">${best.t}</div>
-      <div class="sub">${kr(best.p)} kr/kWh i snit over næste time${diff!=null?` · ${kr(diff)} kr/kWh billigere`:""}</div>`;
+    $("hero").innerHTML = `<div class="lbl">Billigst lige nu</div><div class="name">${best.t}</div>
+      <div class="sub">${kr(best.p)} kr/kWh ${best.key==="home"?"i snit over næste time":"(din indtastede pris)"} · ${kr(priced[1].p-best.p)} kr/kWh billigere</div>`;
+  }else{
+    $("hero").innerHTML = `<div class="lbl">Kan ikke sammenligne endnu</div>
+      <div class="sub">${!home?"Hjemmeprisen mangler.":tesla&&S.tesla==null?"Tesla-prisen er ikke indtastet.":"Venter på nærmeste Tesla-lader."}</div>`;
   }
-  const kwh = S.kw*1;
   $("opts").innerHTML = opts.map(o=>`<div class="opt ${o===best?"best":""}">
      <div><div class="t">${o.t}</div><div class="d">${o.d}</div>${o.warn?`<div class="warn">${o.warn}</div>`:""}</div>
-     <div class="p">${kr(o.p)}<small>kr/kWh · ${kr(o.p*kwh)} kr for ${kr(kwh)} kWh</small></div></div>`).join("");
+     <div class="p">${o.p==null?"–":kr(o.p)}<small>kr/kWh</small></div></div>`).join("");
   if(home) $("qt").innerHTML = home.rows.map(r=>`<tr><td>${r.t.toLocaleTimeString("da-DK",{hour:"2-digit",minute:"2-digit"})}
      (${Math.round(r.min)} min)</td><td>${kr(r.v)} kr/kWh</td></tr>`).join("");
   $("upd").textContent = "Opdateret "+new Date().toLocaleTimeString("da-DK")+(pos?` · GPS ${pos.lat.toFixed(4)}, ${pos.lon.toFixed(4)}`:"");
@@ -212,9 +220,11 @@ async function run(){
 }
 
 /* ---------- Indstillinger ---------- */
-$("sTesla").value=S.tesla; $("sKw").value=S.kw; $("sHome").value=S.home; $("sProd").value=S.prod;
+$("sTesla").value=S.tesla??""; $("sHome").value=S.home; $("sProd").value=S.prod;
 $("save").onclick=()=>{
-  S={tesla:parseFloat($("sTesla").value)||DEF.tesla, kw:parseFloat($("sKw").value)||DEF.kw,
+  const tv=parseFloat($("sTesla").value.replace(",","."));
+  const tNew = isFinite(tv)&&tv>0 ? tv : null;
+  S={tesla:tNew, teslaSet: tNew==null?null:(tNew===S.tesla&&S.teslaSet?S.teslaSet:Date.now()),
      home:$("sHome").value.trim()||DEF.home, prod:$("sProd").value.trim()||DEF.prod};
   saveS(S); ids=null; run();
 };
