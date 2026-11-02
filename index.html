@@ -57,17 +57,12 @@
   <button id="save">Gem og opdatér</button>
 </details>
 
-<footer>Hjemmepris: <a href="https://stromligning.dk" target="_blank" rel="noopener">Strømligning</a> · Ladere: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>-bidragydere<br><span id="upd"></span></footer>
+<footer>Hjemmepris: <a href="https://stromligning.dk" target="_blank" rel="noopener">Strømligning</a> · Ladere: <a href="https://supercharge.info" target="_blank" rel="noopener">supercharge.info</a><br><span id="upd"></span></footer>
 
 <script>
 "use strict";
 const SL = "https://stromligning.dk/api";
-// Offentlige Overpass-instanser (OSM-wiki), prøves i rækkefølge
-const OVERPASS_EPS = [
-  "https://overpass-api.de/api/interpreter",
-  "https://overpass.private.coffee/api/interpreter",
-  "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
-];
+const SITES_URL = "./superchargers.json";   // bygges dagligt af GitHub Actions fra supercharge.info
 const DEF = {
   tesla: 2.60,           // Fast DK-pris for Tesla-ejere/abonnenter (indført maj 2026). Ikke-medlem: 3,60
   kw: 11,
@@ -88,8 +83,8 @@ let t0 = performance.now();
 function log(m){ const el=$("log"); el.textContent += `${((performance.now()-t0)/1000).toFixed(1).padStart(5)} s  ${m}\n`; }
 
 async function getJSON(url, opt={}, ms=20000){
-  const host = new URL(url).host, ac = new AbortController(), to = setTimeout(()=>ac.abort(), ms);
-  log(`→ ${host}${new URL(url).pathname}`);
+  const U = new URL(url, location.href), host = U.host, ac = new AbortController(), to = setTimeout(()=>ac.abort(), ms);
+  log(`→ ${host}${U.pathname}`);
   try{
     const r = await fetch(url, {...opt, signal:ac.signal});
     if(!r.ok) throw new Error(`HTTP ${r.status} fra ${host}`);
@@ -119,48 +114,17 @@ function distKm(a,b){
   return 2*R*Math.asin(Math.sqrt(h));
 }
 
-/* ---------- Nærmeste Tesla Supercharger (OpenStreetMap) ---------- */
-// Lokationer ændrer sig sjældent: cache resultatet og genbrug det, så længe vi er
-// under 25 km fra det sted, forespørgslen blev lavet (radius 150 km giver rigelig margin).
-async function overpassQuery(pos){
-  const q = `[out:json][timeout:25];
-(nwr["amenity"="charging_station"]["brand"~"Tesla",i](around:150000,${pos.lat},${pos.lon});
- nwr["amenity"="charging_station"]["operator"~"Tesla",i](around:150000,${pos.lat},${pos.lon}););
-out center tags;`;
-  const tried=[];
-  for(const ep of OVERPASS_EPS){
-    try{
-      const d = await getJSON(ep,{method:"POST",body:"data="+encodeURIComponent(q),
-        headers:{"Content-Type":"application/x-www-form-urlencoded"}});
-      if(!Array.isArray(d.elements)) throw new Error("uventet svar");
-      return d;
-    }catch(e){ tried.push(e.message); }
-  }
-  throw new Error("alle Overpass-servere fejlede – "+tried.join("; "));
-}
+/* ---------- Nærmeste Tesla Supercharger ----------
+   Listen ligger på samme server som appen, så din position sendes ingen steder hen. */
+let sitesCache=null;
 async function nearestTesla(pos){
-  let cache=null; try{ cache=JSON.parse(localStorage.getItem("ladepris_osm")||"null"); }catch{}
-  let d;
-  if(cache && distKm(pos,cache.c)<25 && Date.now()-cache.t<7*864e5){ d=cache.d; log("Tesla-lader: gemt liste brugt"); }
-  else{
-    try{
-      d = await overpassQuery(pos);
-      try{ localStorage.setItem("ladepris_osm",JSON.stringify({c:pos,t:Date.now(),d})); }catch{}
-    }catch(e){
-      if(cache && distKm(pos,cache.c)<100){ d=cache.d; err("Tesla-lader: bruger gemt liste ("+e.message+")"); }
-      else throw e;
-    }
+  if(!sitesCache){
+    const d = await getJSON(SITES_URL+"?v="+new Date().toISOString().slice(0,10), {cache:"no-cache"});
+    if(!Array.isArray(d.sites) || !d.sites.length) throw new Error("superchargers.json er tom eller ugyldig");
+    sitesCache = d.sites;
+    log(`${sitesCache.length} danske Superchargere indlæst`);
   }
-  const sites = d.elements.map(e=>{
-    const t=e.tags||{}, c=e.center||e;
-    return {name:t.name||t["name:da"]||"Tesla Supercharger", lat:c.lat, lon:c.lon, tags:t};
-  }).filter(s=>{
-    const all=(s.name+" "+(s.tags.brand||"")+" "+(s.tags.network||"")).toLowerCase();
-    return s.lat && !all.includes("destination");          // kun Superchargere
-  });
-  if(!sites.length) throw new Error("Ingen Tesla Supercharger fundet inden for 150 km");
-  sites.forEach(s=>s.km=distKm(pos,s));
-  sites.sort((a,b)=>a.km-b.km);
+  const sites = sitesCache.map(s=>({...s, km:distKm(pos,s)})).sort((a,b)=>a.km-b.km);
   return sites[0];
 }
 
@@ -213,7 +177,7 @@ async function homeHour(){
 function render(home, tesla, pos){
   const opts=[];
   if(home) opts.push({key:"home",t:"Hjemme",d:home.prodName+" · "+home.supName,p:home.avg});
-  if(tesla) opts.push({key:"tesla",t:tesla.name,d:`${kr(tesla.km)} km væk · Tesla Supercharger`,p:S.tesla,
+  if(tesla) opts.push({key:"tesla",t:tesla.name,d:`${kr(tesla.km)} km væk · ${tesla.stalls??"?"} ladere`,p:S.tesla,
                        warn:"Tesla har ingen åben pris-API – prisen er din indstilling. Tjek i Tesla-appen."});
   opts.sort((a,b)=>a.p-b.p);
   const best=opts[0];
