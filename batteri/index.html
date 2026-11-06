@@ -111,7 +111,8 @@
 const SL = "https://stromligning.dk/api";
 const DEF = {price:null, cap:null, fee:null, pow:null, eta:null, mine:null, from:1000, to:20000, tax:true,
              home:"56.1387,9.1577", prod:"vindst.*elforbundet.*2026", days:365};
-const KEY="batteri", CACHE="batteri-cache-v1";
+const KEY="batteri", CACHE="batteri-cache-v2";
+try{ localStorage.removeItem("batteri-cache-v1"); }catch{}
 function loadS(){ try{ return Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||"{}")); }catch{ return {...DEF}; } }
 function saveS(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch{} }
 let S=loadS();
@@ -167,9 +168,10 @@ async function loadHistory(ids){
     if(rows){ log(`cache ${a.toLocaleDateString("da-DK")}–${b.toLocaleDateString("da-DK")}: ${rows.length} poster`); }
     else{
       let d;
-      try{ d=await getJSON(priceURL(ids,a,b,true)); }
+      // Uden aggregation: med aggregation=1h afviser API'et perioder hvis sidste kvarter (starter ved 'to') ikke fylder en hel time
+      try{ d=await getJSON(priceURL(ids,a,b,false)); }
       catch(e){ if(e.status===400) await probe(ids,a); throw e; }
-      rows=(d.prices||[]).filter(p=>!p.forecast).map(p=>[Date.parse(p.date), p.price.total,
+      rows=(d.prices||[]).filter(p=>!p.forecast && Date.parse(p.date)<b.getTime()).map(p=>[Date.parse(p.date), p.price.total,
             p.details?.electricityTax?.total ?? null, p.details?.electricity?.value ?? null]);
       log(`${a.toLocaleDateString("da-DK")}–${b.toLocaleDateString("da-DK")}: ${rows.length} poster`);
       if(rows.length){ cache[k]=rows; cachePut(cache); }
@@ -178,8 +180,9 @@ async function loadHistory(ids){
     raw.push(...rows); a=b;
   }
   // Saml til hele timer (uanset om API'et svarer pr. 15 min eller pr. time)
-  const H=new Map();
+  const seen=new Set(), H=new Map();
   for(const [t,tot,tax,spot] of raw){
+    if(seen.has(t)) continue; seen.add(t);
     if(![t,tot,spot].every(Number.isFinite)) continue;
     const h=Math.floor(t/3600000)*3600000;
     const o=H.get(h)||{n:0,tot:0,tax:0,taxN:0,spot:0}; o.n++; o.tot+=tot; o.spot+=spot;
@@ -231,6 +234,7 @@ function optimize(buy, sell, c, E, P, eta, allowSell){
   if(c>0) step=c/Math.ceil(c/step-1e-9);
   let N=Math.floor(E/step+1e-9);
   if(N>600){ N=600; step=E/600; }
+  if(step>P*eta+1e-9) throw new Error(`Kapacitet ${E} kWh er for stor i forhold til effekt ${P} kW til beregningen (højst 600 ladetrin). Tjek enhederne.`);
   const kd=Math.max(1,Math.floor(P/step+1e-9)), kc=Math.max(1,Math.floor(P*eta/step+1e-9));
   let V=new Float64Array(N+1).fill(Infinity), W=new Float64Array(N+1); V[0]=0;
   const hc=new Float64Array(kd+kc+1);          // hc[d+kd] = timens elregning ved ændring d trin
