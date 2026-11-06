@@ -59,6 +59,11 @@
     <div><label>Round-trip virkningsgrad (%)</label><input id="iEta" type="number" step="1" inputmode="decimal" placeholder="fra datablad">
       <div class="hint">AC→AC, inkl. inverter</div></div>
     <div><label>Dit årsforbrug (kWh, valgfrit)</label><input id="iMine" type="number" step="100" inputmode="decimal" placeholder="markeres på kurven"></div>
+    <div><label>Spidslast fra kl.</label><input id="iPa" type="number" step="1" inputmode="numeric"></div>
+    <div><label>Spidslast til kl.</label><input id="iPb" type="number" step="1" inputmode="numeric"></div>
+    <div><label>Andel af døgnforbrug i spidslast (%)</label><input id="iShare" type="number" step="1" inputmode="decimal">
+      <div class="hint">Resten fordeles jævnt på døgnets øvrige timer</div></div>
+    <div></div>
     <div><label>Kurve fra (kWh/år)</label><input id="iFrom" type="number" step="500" inputmode="decimal"></div>
     <div><label>Kurve til (kWh/år)</label><input id="iTo" type="number" step="500" inputmode="decimal"></div>
   </div>
@@ -87,7 +92,7 @@
     <li><b>Købspris</b> pr. time = Strømlignings <code>price.total</code> for dit elprodukt og netselskab: spot, elselskabets tillæg, net- og systemtarif, Ikast-nettarif og elafgift, inkl. moms. Samme kilde som Ladepris.</li>
     <li><b>Salgspris</b> pr. time = spotpris (<code>details.electricity</code>, ekskl. moms) minus dit gebyr.</li>
     <li>For hvert årsforbrug finder en optimering den bedst mulige lade/aflade-plan time for time over hele perioden. Det kræver, at priserne er kendt på forhånd, så resultatet er det <b>bedst opnåelige</b> med disse priser. En rigtig styring kender kun næste døgns priser.</li>
-    <li><b>Forbruget er fordelt jævnt</b> over døgnets timer (årsforbrug / 8760 pr. time). Det er en antagelse: har du mere forbrug i dyre aftentimer, sparer batteriet mere.</li>
+    <li><b>Forbrugsprofil:</b> den valgte andel af døgnets forbrug ligger i spidslasttimerne (dansk tid, fra-klokkeslæt til, men ikke med, til-klokkeslæt). Resten fordeles jævnt på de øvrige timer. Samme profil hver dag hele året.</li>
     <li>Uden salg kan batteriet kun aflade til eget forbrug i samme time. Med salg kan det også sende overskud ud på nettet.</li>
     <li>Batteriet starter tomt. Tab regnes ved opladning (købt kWh × virkningsgrad = lagret kWh). Effekten gælder på AC-siden begge veje. Ladetilstanden er inddelt i trin (mindst 20), og effekten rundes ned til hele trin, så resultatet er en anelse forsigtigt.</li>
     <li>Ikke medregnet: slid/levetid, standby-forbrug, rente, fremtidige ændringer i priser og tariffer. Besparelsen omregnes til år ud fra antal dage med data.</li>
@@ -109,7 +114,7 @@
 <script>
 "use strict";
 const SL = "https://stromligning.dk/api";
-const DEF = {price:null, cap:null, fee:null, pow:null, eta:null, mine:null, from:1000, to:20000, tax:true,
+const DEF = {price:null, cap:null, fee:null, pow:null, eta:null, mine:null, from:1000, to:20000, tax:true, pa:18, pb:21, share:50,
              home:"56.1387,9.1577", prod:"vindst.*elforbundet.*2026", days:365};
 const KEY="batteri", CACHE="batteri-cache-v2";
 try{ localStorage.removeItem("batteri-cache-v1"); }catch{}
@@ -193,7 +198,9 @@ async function loadHistory(ids){
   const n=hrs.length, buy=new Float64Array(n), tax=new Float64Array(n), spot=new Float64Array(n); let taxOK=true;
   hrs.forEach((h,i)=>{ const o=H.get(h); buy[i]=o.tot/o.n; spot[i]=o.spot/o.n; if(o.taxN) tax[i]=o.tax/o.taxN; else taxOK=false; });
   const expected=Math.round((end-start)/3600000);
-  return {t:hrs, buy, tax, spot, taxOK, n, expected, first:new Date(hrs[0]), last:new Date(hrs[n-1])};
+  const fmt=new Intl.DateTimeFormat("en-GB",{timeZone:"Europe/Copenhagen",hour:"2-digit",hourCycle:"h23"});
+  const lh=new Uint8Array(n); hrs.forEach((h,i)=>{ lh[i]=parseInt(fmt.format(h),10); });
+  return {t:hrs, buy, tax, spot, taxOK, n, lh, expected, first:new Date(hrs[0]), last:new Date(hrs[n-1])};
 }
 
 function priceURL(ids,a,b,agg){
@@ -226,12 +233,13 @@ async function probe(ids,failFrom){
 
 /* ---------- Optimering (dynamisk programmering over ladetilstand) ----------
    Returnerer min. samlet elregning med batteri for et konstant timeforbrug c. */
-function optimize(buy, sell, c, E, P, eta, allowSell){
+function optimize(buy, sell, cons, E, P, eta, allowSell){
   // Effekten P gælder på AC-siden i begge retninger: aflad ≤ P, købt til opladning ≤ P (lagret ≤ P·η)
-  // Trinstørrelse: højst E/20 og P·η, og så timeforbruget c er et helt antal trin
+  // Trinstørrelse: højst E/20 og P·η, og så det mindste timeforbrug er et helt antal trin
   // (ellers kan batteriet ikke aflade præcis det, der bruges, ved lille forbrug).
-  let step=Math.min(E/20, P*eta);
-  if(c>0) step=c/Math.ceil(c/step-1e-9);
+  let step=Math.min(E/20, P*eta), cMin=Infinity;
+  for(const v of cons) if(v>0&&v<cMin) cMin=v;
+  if(Number.isFinite(cMin)) step=cMin/Math.ceil(cMin/step-1e-9);
   let N=Math.floor(E/step+1e-9);
   if(N>600){ N=600; step=E/600; }
   if(step>P*eta+1e-9) throw new Error(`Kapacitet ${E} kWh er for stor i forhold til effekt ${P} kW til beregningen (højst 600 ladetrin). Tjek enhederne.`);
@@ -239,7 +247,7 @@ function optimize(buy, sell, c, E, P, eta, allowSell){
   let V=new Float64Array(N+1).fill(Infinity), W=new Float64Array(N+1); V[0]=0;
   const hc=new Float64Array(kd+kc+1);          // hc[d+kd] = timens elregning ved ændring d trin
   for(let h=0;h<buy.length;h++){
-    const b=buy[h], s=sell[h];
+    const b=buy[h], s=sell[h], c=cons[h];
     for(let d=-kd; d<=kc; d++){
       const e=d*step, g=c+(e>0?e/eta:e);       // nettoforbrug fra nettet
       hc[d+kd]= g>=0 ? g*b : (allowSell ? g*s : 0);
@@ -263,6 +271,8 @@ async function run(){
   const miss=[]; if(!(S.price>0))miss.push("anskaffelsespris"); if(!(S.cap>0))miss.push("kapacitet");
   if(S.fee==null||S.fee<0)miss.push("gebyr pr. solgt kWh"); if(!(S.pow>0))miss.push("effekt"); if(!(S.eta>0&&S.eta<=100))miss.push("virkningsgrad");
   if(!(S.to>S.from&&S.from>0)) miss.push("gyldigt forbrugsinterval");
+  if(!(Number.isInteger(S.pa)&&Number.isInteger(S.pb)&&S.pa>=0&&S.pb<=24&&S.pb>S.pa&&S.pb-S.pa<24)) miss.push("spidslasttimer (hele timer, fra < til)");
+  if(!(S.share>=0&&S.share<=100)) miss.push("andel i spidslast (0–100 %)");
   $("need").textContent = miss.length ? "Mangler: "+miss.join(", ")+"." : "";
   if(miss.length) return;
   $("go").disabled=true;
@@ -277,14 +287,19 @@ async function run(){
     const buy=new Float64Array(n), sell=new Float64Array(n);
     for(let i=0;i<n;i++){ buy[i]= useTax ? H.buy[i]-H.tax[i]+curTax : H.buy[i]; sell[i]=H.spot[i]-S.fee; }
     const days=n/24, eta=S.eta/100;
+    // Forbrugsprofil: andel A af døgnets forbrug i spidstimerne [pa;pb) dansk tid, resten jævnt på de øvrige timer.
+    // shape[h] = andel af årsforbruget i time h; normeret så perioden får årsforbrug·dage/365.
+    const nPk=S.pb-S.pa, A=S.share/100, shape=new Float64Array(n); let sw=0;
+    for(let h=0;h<n;h++){ const lh=H.lh[h], pk=lh>=S.pa&&lh<S.pb; shape[h]= pk ? A/nPk : (1-A)/(24-nPk); sw+=shape[h]; }
+    for(let h=0;h<n;h++) shape[h]*= (days/365)/sw;
     const xs=[]; const STEPS=20;
     for(let i=0;i<=STEPS;i++) xs.push(Math.round(S.from+(S.to-S.from)*i/STEPS));
     if(S.mine>0 && !xs.includes(S.mine)) xs.push(S.mine);
     xs.sort((a,b)=>a-b);
     const pts=[];
     for(let i=0;i<xs.length;i++){
-      const c=xs[i]/8760; // kWh pr. time ved årsforbruget (jævnt fordelt)
-      let base=0; for(let h=0;h<n;h++) base+=c*buy[h];
+      const c=new Float64Array(n); for(let h=0;h<n;h++) c[h]=xs[i]*shape[h];   // kWh i timen h
+      let base=0; for(let h=0;h<n;h++) base+=c[h]*buy[h];
       const r={x:xs[i], base:base*365/days};
       for(const [nm,al] of [["noSell",false],["sell",true]]){
         const cost=optimize(buy,sell,c,S.cap,S.pow,eta,al);
@@ -383,7 +398,7 @@ function render(pts, info){
 }
 
 /* ---------- Input ---------- */
-const F={iPrice:"price",iCap:"cap",iFee:"fee",iPow:"pow",iEta:"eta",iMine:"mine",iFrom:"from",iTo:"to",sDays:"days"};
+const F={iPrice:"price",iCap:"cap",iFee:"fee",iPow:"pow",iEta:"eta",iMine:"mine",iFrom:"from",iTo:"to",iPa:"pa",iPb:"pb",iShare:"share",sDays:"days"};
 function num(v){ const x=parseFloat(String(v).replace(",",".")); return Number.isFinite(x)?x:null; }
 function readInputs(){
   for(const [id,k] of Object.entries(F)) S[k]=num($(id).value);
