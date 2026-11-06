@@ -102,7 +102,7 @@
   <button id="clr">Slet gemte prisdata</button>
 </details>
 
-<details><summary>Log</summary><div id="log" class="log"></div></details>
+<details id="logBox"><summary>Log</summary><div id="log" class="log"></div></details>
 
 <footer>Priser: <a href="https://stromligning.dk" target="_blank" rel="noopener">Strømligning</a> · <a href="../">Ladepris</a></footer>
 
@@ -125,15 +125,16 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 async function getJSON(url,ms=30000){
   const U=new URL(url), ac=new AbortController(), to=setTimeout(()=>ac.abort(),ms);
-  log(`→ ${U.host}${U.pathname}${U.search.length>80?U.search.slice(0,80)+"…":U.search}`);
+  log(`→ ${U.host}${U.pathname}${U.search}`);
   try{
     const r=await fetch(url,{signal:ac.signal});
     if(r.status===429) throw new Error("HTTP 429 – Strømligning siger for mange forespørgsler; prøv igen om 15 min");
-    if(!r.ok) throw new Error(`HTTP ${r.status} fra ${U.host}`);
+    if(!r.ok){ let body=""; try{ body=(await r.text()).slice(0,600); }catch{}
+      const e=new Error(`HTTP ${r.status} fra ${U.host}${body?": "+body:""}`); e.status=r.status; throw e; }
     const j=await r.json(); log(`← OK`); return j;
   }catch(e){
     const m=e.name==="AbortError"?`timeout efter ${ms/1000} s`:(e instanceof TypeError?e.message+" (netværk/CORS blokeret)":e.message);
-    log(`✗ ${m}`); throw new Error(m);
+    log(`✗ ${m}`); const e2=new Error(m); e2.status=e.status; throw e2;
   }finally{ clearTimeout(to); }
 }
 
@@ -165,8 +166,9 @@ async function loadHistory(ids){
     let rows=cache[k];
     if(rows){ log(`cache ${a.toLocaleDateString("da-DK")}–${b.toLocaleDateString("da-DK")}: ${rows.length} poster`); }
     else{
-      const d=await getJSON(`${SL}/prices?productId=${encodeURIComponent(ids.prodId)}&supplierId=${encodeURIComponent(ids.supId)}`+
-                           `&from=${a.toISOString()}&to=${b.toISOString()}&aggregation=1h&forecast=false`);
+      let d;
+      try{ d=await getJSON(priceURL(ids,a,b,true)); }
+      catch(e){ if(e.status===400) await probe(ids,a); throw e; }
       rows=(d.prices||[]).filter(p=>!p.forecast).map(p=>[Date.parse(p.date), p.price.total,
             p.details?.electricityTax?.total ?? null, p.details?.electricity?.value ?? null]);
       log(`${a.toLocaleDateString("da-DK")}–${b.toLocaleDateString("da-DK")}: ${rows.length} poster`);
@@ -189,6 +191,34 @@ async function loadHistory(ids){
   hrs.forEach((h,i)=>{ const o=H.get(h); buy[i]=o.tot/o.n; spot[i]=o.spot/o.n; if(o.taxN) tax[i]=o.tax/o.taxN; else taxOK=false; });
   const expected=Math.round((end-start)/3600000);
   return {t:hrs, buy, tax, spot, taxOK, n, expected, first:new Date(hrs[0]), last:new Date(hrs[n-1])};
+}
+
+function priceURL(ids,a,b,agg){
+  return `${SL}/prices?productId=${encodeURIComponent(ids.prodId)}&supplierId=${encodeURIComponent(ids.supId)}`+
+         `&from=${a.toISOString()}&to=${b.toISOString()}${agg?"&aggregation=1h":""}&forecast=false`;
+}
+// Ved HTTP 400: små prøveopslag der hver ændrer én ting, så loggen viser hvad der udløser fejlen
+async function probe(ids,failFrom){
+  const now=new Date(), day=86400000;
+  const tests=[
+    ["A: seneste døgn, med aggregation=1h", new Date(now-day), now, true],
+    ["B: seneste døgn, uden aggregation",   new Date(now-day), now, false],
+    ["C: døgnet fra den fejlende startdato, med aggregation", failFrom, new Date(+failFrom+day), true],
+    ["D: døgnet fra den fejlende startdato, uden aggregation", failFrom, new Date(+failFrom+day), false],
+    ["E: seneste 31 døgn, med aggregation", new Date(now-31*day), now, true],
+  ];
+  log("--- Diagnose af HTTP 400 ---");
+  for(const [nm,a,b,agg] of tests){
+    await sleep(400);
+    try{
+      const r=await fetch(priceURL(ids,a,b,agg)); const txt=await r.text();
+      let info=txt.slice(0,300);
+      if(r.ok){ try{ const j=JSON.parse(txt); const p=j.prices||[];
+        info=`${p.length} poster${p.length?`, første ${p[0].date}, sidste ${p[p.length-1].date}`:""}`; }catch{} }
+      log(`${nm}: HTTP ${r.status} – ${info}`);
+    }catch(e){ log(`${nm}: ${e.message}`); }
+  }
+  log("--- slut på diagnose ---");
 }
 
 /* ---------- Optimering (dynamisk programmering over ladetilstand) ----------
@@ -263,7 +293,7 @@ async function run(){
     let avgB=0,avgS=0; for(let i=0;i<n;i++){avgB+=buy[i];avgS+=H.spot[i];}
     render(pts, {days, avgB:avgB/n, avgS:avgS/n, curTax, useTax});
     log("Færdig");
-  }catch(e){ err(e.message); }
+  }catch(e){ err(e.message); $("logBox").open=true; }
   finally{ $("go").disabled=false; $("go").textContent="Beregn"; }
 }
 
