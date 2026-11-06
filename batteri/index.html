@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111418">
+<title>Batteri – tilbagebetalingstid</title>
+<style>
+  :root{--bg:#111418;--card:#1b2027;--line:#2a313b;--grid:#252b34;--txt:#e8ecf1;--dim:#8c97a6;--err:#ff6b6b;--warn:#e5a54b;
+        --s1:#4a8ff0;--s2:#c27f1c}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:16px;max-width:720px;margin-inline:auto}
+  h1{font-size:18px;font-weight:600;margin:4px 0 14px;color:var(--dim)}
+  .card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:12px;border:1px solid var(--line)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  label{display:block;margin:10px 0 4px;font-size:13px;color:var(--dim)}
+  input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0d1014;color:var(--txt);font-size:16px}
+  input[type=checkbox]{width:auto;margin-right:8px}
+  .chk{display:flex;align-items:center;margin-top:12px;font-size:14px;color:var(--txt)}
+  button{margin-top:14px;padding:12px 16px;border-radius:10px;border:0;background:#2d6cdf;color:#fff;font-size:16px;width:100%}
+  button:disabled{opacity:.5}
+  .hint{color:var(--dim);font-size:12px;margin-top:3px}
+  .err{color:var(--err);font-size:14px;white-space:pre-wrap}
+  .warn{color:var(--warn);font-size:13px;white-space:pre-wrap}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{background:#0d1014;border-radius:12px;padding:12px;border:1px solid var(--line)}
+  .stat .k{font-size:12px;color:var(--dim)}
+  .stat .v{font-size:26px;font-weight:700}
+  .stat .s{font-size:12px;color:var(--dim)}
+  .sw{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+  .legend{display:flex;gap:16px;font-size:13px;color:var(--dim);margin-bottom:6px;flex-wrap:wrap}
+  #chartWrap{position:relative}
+  svg{display:block;width:100%;height:auto;touch-action:none}
+  .tip{position:absolute;pointer-events:none;background:#0d1014;border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:13px;display:none;white-space:nowrap;z-index:2}
+  .tip b{font-weight:600}
+  details{background:var(--card);border-radius:14px;padding:12px 16px;border:1px solid var(--line);margin-top:12px}
+  summary{cursor:pointer;color:var(--dim)}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  th,td{padding:4px 4px;border-bottom:1px solid var(--line);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--dim);font-weight:500}
+  ul{margin:8px 0;padding-left:18px;font-size:14px}
+  li{margin:4px 0}
+  .log{color:var(--dim);font:12px/1.5 ui-monospace,monospace;white-space:pre-wrap;margin-top:8px;max-height:220px;overflow:auto}
+  footer{color:var(--dim);font-size:12px;margin-top:16px;text-align:center}
+  a{color:#7fb0ff}
+</style>
+</head>
+<body>
+<h1>Batteri på nettet · tilbagebetalingstid ud fra historiske elpriser</h1>
+
+<div class="card">
+  <div class="grid2">
+    <div><label>Anskaffelsespris (kr, alt inkl.)</label><input id="iPrice" type="number" inputmode="decimal" placeholder="ikke indtastet"></div>
+    <div><label>Brugbar kapacitet (kWh)</label><input id="iCap" type="number" step="0.1" inputmode="decimal" placeholder="ikke indtastet"></div>
+    <div><label>Gebyr pr. solgt kWh (kr)</label><input id="iFee" type="number" step="0.001" inputmode="decimal" placeholder="ikke indtastet">
+      <div class="hint">Trækkes fra spotprisen ved salg</div></div>
+    <div><label>Maks. lade-/afladeeffekt (kW)</label><input id="iPow" type="number" step="0.1" inputmode="decimal" placeholder="fra datablad"></div>
+    <div><label>Round-trip virkningsgrad (%)</label><input id="iEta" type="number" step="1" inputmode="decimal" placeholder="fra datablad">
+      <div class="hint">AC→AC, inkl. inverter</div></div>
+    <div><label>Dit årsforbrug (kWh, valgfrit)</label><input id="iMine" type="number" step="100" inputmode="decimal" placeholder="markeres på kurven"></div>
+    <div><label>Kurve fra (kWh/år)</label><input id="iFrom" type="number" step="500" inputmode="decimal"></div>
+    <div><label>Kurve til (kWh/år)</label><input id="iTo" type="number" step="500" inputmode="decimal"></div>
+  </div>
+  <label class="chk"><input id="iTax" type="checkbox">Regn hele perioden med den aktuelle elafgift</label>
+  <div class="hint">Elafgiften er sat ned fra 1/1-2026. Slået til erstattes elafgiften i hver historisk time med den i det nyeste prispunkt.</div>
+  <button id="go">Beregn</button>
+  <div id="need" class="warn"></div>
+</div>
+
+<div id="errs" class="err"></div>
+
+<div class="card" id="res" hidden>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--s1)"></span>Kun eget forbrug (intet salg)</span>
+    <span><svg width="22" height="6" style="vertical-align:middle;margin-right:6px;display:inline"><line x1="1" x2="21" y1="3" y2="3" stroke="#c27f1c" stroke-width="2" stroke-dasharray="7 5"/></svg>Med salg til nettet</span>
+  </div>
+  <div id="chartWrap"><svg id="chart" viewBox="0 0 680 380" role="img" aria-label="Tilbagebetalingstid i år som funktion af årligt forbrug"></svg><div class="tip" id="tip"></div></div>
+  <div id="mine" class="stats" style="margin-top:12px"></div>
+  <div id="dataInfo" class="hint" style="margin-top:10px"></div>
+</div>
+
+<details id="tblBox" hidden><summary>Tabel</summary><table id="tbl"></table></details>
+
+<details><summary>Sådan regnes der – og hvad modellen antager</summary>
+  <ul>
+    <li><b>Købspris</b> pr. time = Strømlignings <code>price.total</code> for dit elprodukt og netselskab: spot, elselskabets tillæg, net- og systemtarif, Ikast-nettarif og elafgift, inkl. moms. Samme kilde som Ladepris.</li>
+    <li><b>Salgspris</b> pr. time = spotpris (<code>details.electricity</code>, ekskl. moms) minus dit gebyr.</li>
+    <li>For hvert årsforbrug finder en optimering den bedst mulige lade/aflade-plan time for time over hele perioden. Det kræver, at priserne er kendt på forhånd, så resultatet er det <b>bedst opnåelige</b> med disse priser. En rigtig styring kender kun næste døgns priser.</li>
+    <li><b>Forbruget er fordelt jævnt</b> over døgnets timer (årsforbrug / 8760 pr. time). Det er en antagelse: har du mere forbrug i dyre aftentimer, sparer batteriet mere.</li>
+    <li>Uden salg kan batteriet kun aflade til eget forbrug i samme time. Med salg kan det også sende overskud ud på nettet.</li>
+    <li>Batteriet starter tomt. Tab regnes ved opladning (købt kWh × virkningsgrad = lagret kWh). Effekten gælder på AC-siden begge veje. Ladetilstanden er inddelt i trin (mindst 20), og effekten rundes ned til hele trin, så resultatet er en anelse forsigtigt.</li>
+    <li>Ikke medregnet: slid/levetid, standby-forbrug, rente, fremtidige ændringer i priser og tariffer. Besparelsen omregnes til år ud fra antal dage med data.</li>
+    <li>Tilbagebetalingstid = anskaffelsespris / årlig besparelse.</li>
+  </ul>
+</details>
+
+<details><summary>Indstillinger for elpris</summary>
+  <label>Netselskab-søgning (hjemmeadresse, lat,lon)</label><input id="sHome" type="text">
+  <label>Elprodukt (regex på "Selskab - Produkt")</label><input id="sProd" type="text">
+  <label>Historik (dage tilbage fra i dag)</label><input id="sDays" type="number" step="1">
+  <button id="clr">Slet gemte prisdata</button>
+</details>
+
+<details><summary>Log</summary><div id="log" class="log"></div></details>
+
+<footer>Priser: <a href="https://stromligning.dk" target="_blank" rel="noopener">Strømligning</a> · <a href="../">Ladepris</a></footer>
+
+<script>
+"use strict";
+const SL = "https://stromligning.dk/api";
+const DEF = {price:null, cap:null, fee:null, pow:null, eta:null, mine:null, from:1000, to:20000, tax:true,
+             home:"56.1387,9.1577", prod:"vindst.*elforbundet.*2026", days:365};
+const KEY="batteri", CACHE="batteri-cache-v1";
+function loadS(){ try{ return Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||"{}")); }catch{ return {...DEF}; } }
+function saveS(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch{} }
+let S=loadS();
+
+const $=id=>document.getElementById(id);
+const nf=(v,d=0)=>v.toLocaleString("da-DK",{minimumFractionDigits:d,maximumFractionDigits:d});
+const errs=[]; function err(m){ errs.push(m); $("errs").textContent=errs.join("\n"); }
+let t0=performance.now();
+function log(m){ const el=$("log"); el.textContent+=`${((performance.now()-t0)/1000).toFixed(1).padStart(5)} s  ${m}\n`; }
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function getJSON(url,ms=30000){
+  const U=new URL(url), ac=new AbortController(), to=setTimeout(()=>ac.abort(),ms);
+  log(`→ ${U.host}${U.pathname}${U.search.length>80?U.search.slice(0,80)+"…":U.search}`);
+  try{
+    const r=await fetch(url,{signal:ac.signal});
+    if(r.status===429) throw new Error("HTTP 429 – Strømligning siger for mange forespørgsler; prøv igen om 15 min");
+    if(!r.ok) throw new Error(`HTTP ${r.status} fra ${U.host}`);
+    const j=await r.json(); log(`← OK`); return j;
+  }catch(e){
+    const m=e.name==="AbortError"?`timeout efter ${ms/1000} s`:(e instanceof TypeError?e.message+" (netværk/CORS blokeret)":e.message);
+    log(`✗ ${m}`); throw new Error(m);
+  }finally{ clearTimeout(to); }
+}
+
+/* ---------- Strømligning: samme opslag som Ladepris ---------- */
+async function resolveIds(){
+  const [hl,hn]=S.home.split(",").map(Number);
+  const sup=(await getJSON(`${SL}/suppliers/find?lat=${hl}&long=${hn}`))[0];
+  if(!sup) throw new Error("Strømligning fandt intet netselskab for hjemmeadressen");
+  const comps=await getJSON(`${SL}/companies?region=${sup.priceArea}`);
+  const re=new RegExp(S.prod,"i"); let prod=null;
+  for(const c of comps) for(const p of c.products||[]){ const n=`${c.name} - ${p.name}`; if(!prod&&re.test(n)) prod={id:p.id,name:n,type:p.productType}; }
+  if(!prod) throw new Error(`Intet elprodukt matcher /${S.prod}/ i ${sup.priceArea}`);
+  if(prod.type==="fixed") throw new Error(`${prod.name} er et fastprisprodukt – understøttes ikke`);
+  return {supId:sup.id, supName:sup.name||sup.id, area:sup.priceArea, prodId:prod.id, prodName:prod.name};
+}
+
+function cacheGet(){ try{ return JSON.parse(localStorage.getItem(CACHE)||"{}"); }catch{ return {}; } }
+function cachePut(c){ try{ localStorage.setItem(CACHE,JSON.stringify(c)); }catch(e){ log("Cache kunne ikke gemmes: "+e.message); } }
+
+// Henter perioden i bidder af højst 31 døgn. Afsluttede bidder gemmes lokalt.
+async function loadHistory(ids){
+  const end=new Date(); end.setHours(0,0,0,0);
+  const start=new Date(end); start.setDate(start.getDate()-S.days);
+  const cache=cacheGet(); const pre=`${ids.prodId}|${ids.supId}|`;
+  const raw=[]; let a=new Date(start);
+  while(a<end){
+    const b=new Date(a); b.setDate(b.getDate()+31); if(b>end) b.setTime(end.getTime());
+    const k=pre+a.toISOString()+"|"+b.toISOString();
+    let rows=cache[k];
+    if(rows){ log(`cache ${a.toLocaleDateString("da-DK")}–${b.toLocaleDateString("da-DK")}: ${rows.length} poster`); }
+    else{
+      const d=await getJSON(`${SL}/prices?productId=${encodeURIComponent(ids.prodId)}&supplierId=${encodeURIComponent(ids.supId)}`+
+                           `&from=${a.toISOString()}&to=${b.toISOString()}&aggregation=1h&forecast=false`);
+      rows=(d.prices||[]).filter(p=>!p.forecast).map(p=>[Date.parse(p.date), p.price.total,
+            p.details?.electricityTax?.total ?? null, p.details?.electricity?.value ?? null]);
+      log(`${a.toLocaleDateString("da-DK")}–${b.toLocaleDateString("da-DK")}: ${rows.length} poster`);
+      if(rows.length){ cache[k]=rows; cachePut(cache); }
+      await sleep(400);
+    }
+    raw.push(...rows); a=b;
+  }
+  // Saml til hele timer (uanset om API'et svarer pr. 15 min eller pr. time)
+  const H=new Map();
+  for(const [t,tot,tax,spot] of raw){
+    if(![t,tot,spot].every(Number.isFinite)) continue;
+    const h=Math.floor(t/3600000)*3600000;
+    const o=H.get(h)||{n:0,tot:0,tax:0,taxN:0,spot:0}; o.n++; o.tot+=tot; o.spot+=spot;
+    if(Number.isFinite(tax)){ o.tax+=tax; o.taxN++; } H.set(h,o);
+  }
+  const hrs=[...H.keys()].filter(h=>h>=start.getTime()&&h<end.getTime()).sort((x,y)=>x-y);
+  if(!hrs.length) throw new Error("Strømligning returnerede ingen historiske priser for perioden");
+  const n=hrs.length, buy=new Float64Array(n), tax=new Float64Array(n), spot=new Float64Array(n); let taxOK=true;
+  hrs.forEach((h,i)=>{ const o=H.get(h); buy[i]=o.tot/o.n; spot[i]=o.spot/o.n; if(o.taxN) tax[i]=o.tax/o.taxN; else taxOK=false; });
+  const expected=Math.round((end-start)/3600000);
+  return {t:hrs, buy, tax, spot, taxOK, n, expected, first:new Date(hrs[0]), last:new Date(hrs[n-1])};
+}
+
+/* ---------- Optimering (dynamisk programmering over ladetilstand) ----------
+   Returnerer min. samlet elregning med batteri for et konstant timeforbrug c. */
+function optimize(buy, sell, c, E, P, eta, allowSell){
+  // Effekten P gælder på AC-siden i begge retninger: aflad ≤ P, købt til opladning ≤ P (lagret ≤ P·η)
+  // Trinstørrelse: højst E/20 og P·η, og så timeforbruget c er et helt antal trin
+  // (ellers kan batteriet ikke aflade præcis det, der bruges, ved lille forbrug).
+  let step=Math.min(E/20, P*eta);
+  if(c>0) step=c/Math.ceil(c/step-1e-9);
+  let N=Math.floor(E/step+1e-9);
+  if(N>600){ N=600; step=E/600; }
+  const kd=Math.max(1,Math.floor(P/step+1e-9)), kc=Math.max(1,Math.floor(P*eta/step+1e-9));
+  let V=new Float64Array(N+1).fill(Infinity), W=new Float64Array(N+1); V[0]=0;
+  const hc=new Float64Array(kd+kc+1);          // hc[d+kd] = timens elregning ved ændring d trin
+  for(let h=0;h<buy.length;h++){
+    const b=buy[h], s=sell[h];
+    for(let d=-kd; d<=kc; d++){
+      const e=d*step, g=c+(e>0?e/eta:e);       // nettoforbrug fra nettet
+      hc[d+kd]= g>=0 ? g*b : (allowSell ? g*s : 0);
+    }
+    for(let j=0;j<=N;j++){
+      let best=Infinity; const lo=Math.max(0,j-kc), hi=Math.min(N,j+kd);
+      for(let i=lo;i<=hi;i++){ const v=V[i]+hc[j-i+kd]; if(v<best) best=v; }
+      W[j]=best;
+    }
+    const tmp=V; V=W; W=tmp;
+  }
+  let m=Infinity; for(const v of V) if(v<m) m=v; return m;
+}
+
+/* ---------- Beregning ---------- */
+let hist=null, histKey="", lastPts=null, lastInfo=null;
+let rz=null; addEventListener("resize",()=>{ clearTimeout(rz); rz=setTimeout(()=>{ if(lastPts) render(lastPts,lastInfo); },150); });
+async function run(){
+  errs.length=0; $("errs").textContent=""; $("log").textContent=""; t0=performance.now();
+  readInputs();
+  const miss=[]; if(!(S.price>0))miss.push("anskaffelsespris"); if(!(S.cap>0))miss.push("kapacitet");
+  if(S.fee==null||S.fee<0)miss.push("gebyr pr. solgt kWh"); if(!(S.pow>0))miss.push("effekt"); if(!(S.eta>0&&S.eta<=100))miss.push("virkningsgrad");
+  if(!(S.to>S.from&&S.from>0)) miss.push("gyldigt forbrugsinterval");
+  $("need").textContent = miss.length ? "Mangler: "+miss.join(", ")+"." : "";
+  if(miss.length) return;
+  $("go").disabled=true;
+  try{
+    const key=S.home+"|"+S.prod+"|"+S.days+"|"+new Date().toDateString();
+    if(!hist||histKey!==key){ $("go").textContent="Henter priser…"; const ids=await resolveIds(); hist=await loadHistory(ids); hist.ids=ids; histKey=key; }
+    $("go").textContent="Regner…"; await sleep(20);
+    const H=hist, n=H.n;
+    const curTax=H.tax[n-1];
+    const useTax = S.tax && H.taxOK;
+    if(S.tax && !H.taxOK) err("Elafgift mangler i nogle prispunkter – regner med de historiske totalpriser uden justering.");
+    const buy=new Float64Array(n), sell=new Float64Array(n);
+    for(let i=0;i<n;i++){ buy[i]= useTax ? H.buy[i]-H.tax[i]+curTax : H.buy[i]; sell[i]=H.spot[i]-S.fee; }
+    const days=n/24, eta=S.eta/100;
+    const xs=[]; const STEPS=20;
+    for(let i=0;i<=STEPS;i++) xs.push(Math.round(S.from+(S.to-S.from)*i/STEPS));
+    if(S.mine>0 && !xs.includes(S.mine)) xs.push(S.mine);
+    xs.sort((a,b)=>a-b);
+    const pts=[];
+    for(let i=0;i<xs.length;i++){
+      const c=xs[i]/8760; // kWh pr. time ved årsforbruget (jævnt fordelt)
+      let base=0; for(let h=0;h<n;h++) base+=c*buy[h];
+      const r={x:xs[i], base:base*365/days};
+      for(const [nm,al] of [["noSell",false],["sell",true]]){
+        const cost=optimize(buy,sell,c,S.cap,S.pow,eta,al);
+        const sav=(base-cost)*365/days;
+        r[nm]={sav, pay: sav>0 ? S.price/sav : Infinity};
+      }
+      pts.push(r);
+      $("go").textContent=`Regner… ${i+1}/${xs.length}`; await sleep(0);
+    }
+    let avgB=0,avgS=0; for(let i=0;i<n;i++){avgB+=buy[i];avgS+=H.spot[i];}
+    render(pts, {days, avgB:avgB/n, avgS:avgS/n, curTax, useTax});
+    log("Færdig");
+  }catch(e){ err(e.message); }
+  finally{ $("go").disabled=false; $("go").textContent="Beregn"; }
+}
+
+/* ---------- Graf ---------- */
+const yrs=v=>Number.isFinite(v)?nf(v,1)+" år":"betaler sig ikke";
+function render(pts, info){
+  $("res").hidden=false; $("tblBox").hidden=false;
+  const W=Math.max(300,$("chartWrap").clientWidth||680), Hh=Math.max(240,Math.min(400,Math.round(W*0.6))),
+        L=44,R=10,T=14,B=44, pw=W-L-R, ph=Hh-T-B;
+  lastPts=pts; lastInfo=info;
+  const fin=pts.flatMap(p=>[p.noSell.pay,p.sell.pay]).filter(Number.isFinite);
+  const yCap=50;
+  let yMax=fin.length?Math.min(yCap,Math.max(...fin)):10;
+  const niceStep=v=>{const m=Math.pow(10,Math.floor(Math.log10(v)))/10;return [1,2,5,10,20,50,100].map(f=>f*m).find(s=>v/s<=6);};
+  const ys=niceStep(yMax||1); yMax=Math.ceil((yMax||1)/ys)*ys;
+  const x0=pts[0].x, x1=pts[pts.length-1].x;
+  const X=v=>L+(v-x0)/(x1-x0)*pw, Y=v=>T+ph-Math.min(v,yMax)/yMax*ph;
+  const xs=niceStep((x1-x0)/1);
+  let g=`<rect x="0" y="0" width="${W}" height="${Hh}" fill="none"/>`;
+  for(let v=0;v<=yMax+1e-9;v+=ys) g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)" stroke-width="1"/>
+     <text x="${L-8}" y="${Y(v)+4}" fill="var(--dim)" font-size="12" text-anchor="end">${nf(v)}</text>`;
+  for(let v=Math.ceil(x0/xs)*xs; v<=x1; v+=xs) g+=`<text x="${X(v)}" y="${T+ph+18}" fill="var(--dim)" font-size="12" text-anchor="middle">${nf(v)}</text>`;
+  g+=`<line x1="${L}" x2="${W-R}" y1="${T+ph}" y2="${T+ph}" stroke="var(--line)"/>`;
+  g+=`<text x="${L+pw/2}" y="${Hh-6}" fill="var(--dim)" font-size="12" text-anchor="middle">Årligt forbrug (kWh)</text>`;
+  g+=`<text x="11" y="${T+ph/2}" fill="var(--dim)" font-size="12" text-anchor="middle" transform="rotate(-90 12 ${T+ph/2})">Tilbagebetalingstid (år)</text>`;
+  if(fin.some(v=>v>yCap)) g+=`<text x="${W-R}" y="${T+10}" fill="var(--dim)" font-size="11" text-anchor="end">over ${yCap} år vises ikke (se tabel)</text>`;
+  const series=[["noSell","var(--s1)","Intet salg",""],["sell","var(--s2)","Med salg","7 5"]];
+  const shown=v=>Number.isFinite(v)&&v<=yMax;
+  for(const [k,col,,dash] of series){
+    let d="", pen=false;
+    for(const p of pts){ const v=p[k].pay; if(shown(v)){ d+=(pen?"L":"M")+X(p.x).toFixed(1)+","+Y(v).toFixed(1); pen=true; } else pen=false; }
+    g+=`<path d="${d}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"${dash?` stroke-dasharray="${dash}"`:""}/>`;
+  }
+  // Direkte etiketter ved højre ende (skubbes fra hinanden hvis de overlapper)
+  const ends=series.map(([k,col,nm])=>{ const p=[...pts].reverse().find(p=>shown(p[k].pay)); return p?{y:Y(p[k].pay),x:X(p.x),nm,by:0}:null; }).filter(Boolean);
+  ends.forEach(e=>e.by=e.y-8);
+  if(ends.length===2 && Math.abs(ends[0].y-ends[1].y)<16){ const [hi,lo]=ends[0].y<=ends[1].y?ends:[ends[1],ends[0]]; hi.by=hi.y-8; lo.by=Math.max(lo.y,hi.y)+18; }
+  for(const e of ends) g+=`<text x="${Math.min(e.x,W-R)-4}" y="${e.by}" fill="var(--txt)" font-size="12" text-anchor="end">${e.nm}</text>`;
+  if(S.mine>0){ const p=pts.find(p=>p.x===S.mine);
+    g+=`<line x1="${X(S.mine)}" x2="${X(S.mine)}" y1="${T}" y2="${T+ph}" stroke="var(--dim)" stroke-dasharray="3 4"/>
+        <text x="${X(S.mine)+4}" y="${T+12}" fill="var(--dim)" font-size="11">dit forbrug</text>`;
+    for(const [k,col] of series) if(shown(p[k].pay)) g+=`<circle cx="${X(p.x)}" cy="${Y(p[k].pay)}" r="5" fill="${col}" stroke="var(--card)" stroke-width="2"/>`; }
+  g+=`<g id="hov" visibility="hidden"><line id="hl" y1="${T}" y2="${T+ph}" stroke="var(--dim)"/>
+      <circle id="h1" r="5" fill="var(--s1)" stroke="var(--card)" stroke-width="2"/><circle id="h2" r="5" fill="var(--s2)" stroke="var(--card)" stroke-width="2"/></g>
+      <rect id="hit" x="${L}" y="${T}" width="${pw}" height="${ph}" fill="transparent"/>`;
+  // SVG-attributter får faste farver (var() i præsentationsattributter virker ikke i alle browsere)
+  const cs=getComputedStyle(document.documentElement);
+  g=g.replace(/(fill|stroke)="var\(--([\w-]+)\)"/g,(m,a,n)=>`${a}="${cs.getPropertyValue("--"+n).trim()||"#888"}"`);
+  const svg=$("chart"); svg.setAttribute("viewBox",`0 0 ${W} ${Hh}`); svg.innerHTML=g;
+
+  const tip=$("tip");
+  const show=ev=>{
+    const r=svg.getBoundingClientRect(), sx=(ev.clientX-r.left)/r.width*W;
+    let p=pts[0]; for(const q of pts) if(Math.abs(X(q.x)-sx)<Math.abs(X(p.x)-sx)) p=q;
+    $("hov").setAttribute("visibility","visible"); $("hl").setAttribute("x1",X(p.x)); $("hl").setAttribute("x2",X(p.x));
+    [["h1","noSell"],["h2","sell"]].forEach(([id,k])=>{ const c=$(id), v=p[k].pay;
+      c.setAttribute("visibility",shown(v)?"visible":"hidden"); c.setAttribute("cx",X(p.x)); c.setAttribute("cy",Y(shown(v)?v:0)); });
+    tip.innerHTML=`<b>${nf(p.x)} kWh/år</b><br><span class="sw" style="background:var(--s1)"></span>Intet salg: ${yrs(p.noSell.pay)} · ${nf(p.noSell.sav)} kr/år<br>
+      <span class="sw" style="background:var(--s2)"></span>Med salg: ${yrs(p.sell.pay)} · ${nf(p.sell.sav)} kr/år`;
+    tip.style.display="block";
+    const px=X(p.x)/W*r.width, wrap=$("chartWrap").clientWidth, tw=tip.offsetWidth;
+    tip.style.left=Math.max(0,Math.min(wrap-tw, px+12>wrap-tw?px-tw-12:px+12))+"px"; tip.style.top="8px";
+  };
+  const hide=()=>{ $("hov").setAttribute("visibility","hidden"); tip.style.display="none"; };
+  const hit=$("hit"); hit.onpointermove=show; hit.onpointerdown=show; hit.onpointerleave=hide;
+
+  // Nøgletal ved dit forbrug
+  if(S.mine>0){ const p=pts.find(p=>p.x===S.mine);
+    $("mine").innerHTML=[["Intet salg","noSell","var(--s1)"],["Med salg","sell","var(--s2)"]].map(([nm,k,c])=>
+      `<div class="stat"><div class="k"><span class="sw" style="background:${c}"></span>${nm} · ${nf(S.mine)} kWh/år</div>
+       <div class="v">${yrs(p[k].pay)}</div><div class="s">besparelse ${nf(p[k].sav)} kr/år af ${nf(p.base)} kr/år</div></div>`).join("");
+  } else $("mine").innerHTML="";
+
+  const H=hist;
+  $("dataInfo").innerHTML=`${H.ids.prodName} · ${H.ids.supName} (${H.ids.area}).<br>
+    Data ${H.first.toLocaleDateString("da-DK")} – ${H.last.toLocaleDateString("da-DK")}: ${nf(H.n)} timer af ${nf(H.expected)} forventede (${nf(info.days,1)} døgn, omregnet til år).
+    ${H.n<H.expected*0.98?`<span class="warn">Huller i data.</span>`:""}<br>
+    Gns. købspris ${nf(info.avgB,2)} kr/kWh${info.useTax?` (elafgift sat til ${nf(info.curTax,3)} kr/kWh fra nyeste prispunkt)`:" (historisk elafgift)"} · gns. spot ${nf(info.avgS,2)} kr/kWh ekskl. moms.`;
+
+  $("tbl").innerHTML=`<tr><th>Forbrug kWh/år</th><th>Elregning uden batteri</th><th>Intet salg: kr/år</th><th>år</th><th>Med salg: kr/år</th><th>år</th></tr>`+
+    pts.map(p=>`<tr><td>${nf(p.x)}</td><td>${nf(p.base)}</td><td>${nf(p.noSell.sav)}</td><td>${Number.isFinite(p.noSell.pay)?nf(p.noSell.pay,1):"–"}</td>
+      <td>${nf(p.sell.sav)}</td><td>${Number.isFinite(p.sell.pay)?nf(p.sell.pay,1):"–"}</td></tr>`).join("");
+}
+
+/* ---------- Input ---------- */
+const F={iPrice:"price",iCap:"cap",iFee:"fee",iPow:"pow",iEta:"eta",iMine:"mine",iFrom:"from",iTo:"to",sDays:"days"};
+function num(v){ const x=parseFloat(String(v).replace(",",".")); return Number.isFinite(x)?x:null; }
+function readInputs(){
+  for(const [id,k] of Object.entries(F)) S[k]=num($(id).value);
+  if(!(S.days>0)) S.days=DEF.days; S.days=Math.round(S.days);
+  if(S.mine!=null) S.mine=Math.round(S.mine);
+  S.tax=$("iTax").checked; S.home=$("sHome").value.trim()||DEF.home; S.prod=$("sProd").value.trim()||DEF.prod;
+  saveS();
+}
+for(const [id,k] of Object.entries(F)) $(id).value=S[k]??"";
+$("iTax").checked=!!S.tax; $("sHome").value=S.home; $("sProd").value=S.prod;
+$("go").onclick=run;
+$("clr").onclick=()=>{ try{ localStorage.removeItem(CACHE); }catch{} hist=null; log("Gemte prisdata slettet"); };
+run();
+</script>
+</body>
+</html>
