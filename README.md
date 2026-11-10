@@ -3,7 +3,7 @@
 Viser den billigste oplademulighed lige nu, målt som gennemsnitlig kr/kWh over den kommende time:
 
 - **Hjemme:** Vindstød Elforbundet.dk 2026 + Ikast El Net (alt inkl.), via [Strømligning](https://stromligning.dk)
-- **Nærmeste Tesla Supercharger** ud fra GPS, via OpenStreetMap. Tesla-prisen er en indstilling (der findes ingen åben pris-API).
+- **Nærmeste Tesla, Circle K og OK** ud fra GPS. `chargers.json` bygges hver time af GitHub Actions (`tools/build_chargers.py`): Tesla fra supercharge.info, Circle K/OK fra OpenStreetMap, priser fra circlek.dk og ok.dk. Tesla-prisen indtastes manuelt (ingen åben pris-API).
 
 Åbn: https://favetronics.github.io/Ladepris/
 

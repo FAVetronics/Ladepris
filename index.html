@@ -55,12 +55,12 @@
   <button id="save">Gem og opdatér</button>
 </details>
 
-<footer>Hjemmepris: <a href="https://stromligning.dk" target="_blank" rel="noopener">Strømligning</a> · Ladere: <a href="https://supercharge.info" target="_blank" rel="noopener">supercharge.info</a><br><span id="upd"></span></footer>
+<footer>Hjemmepris: <a href="https://stromligning.dk" target="_blank" rel="noopener">Strømligning</a> · Ladere: <a href="https://supercharge.info" target="_blank" rel="noopener">supercharge.info</a>, © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> · Priser: <a href="https://www.circlek.dk/priser" target="_blank" rel="noopener">circlek.dk</a>, <a href="https://www.ok.dk/privat/produkter/opladning/ude/ladestander-priser" target="_blank" rel="noopener">ok.dk</a><br><span id="upd"></span></footer>
 
 <script>
 "use strict";
 const SL = "https://stromligning.dk/api";
-const SITES_URL = "./superchargers.json";   // bygges dagligt af GitHub Actions fra supercharge.info
+const DATA_URL = "./chargers.json";   // bygges hver time af GitHub Actions (se tools/build_chargers.py)
 const DEF = {
   tesla: null,           // Ingen standard: Tesla har ingen åben pris-API, så prisen skal indtastes fra Tesla-appen
   teslaSet: null,        // tidspunkt for indtastning
@@ -119,18 +119,50 @@ function distKm(a,b){
   return 2*R*Math.asin(Math.sqrt(h));
 }
 
-/* ---------- Nærmeste Tesla Supercharger ----------
-   Listen ligger på samme server som appen, så din position sendes ingen steder hen. */
-let sitesCache=null;
-async function nearestTesla(pos){
-  if(!sitesCache){
-    const d = await getJSON(SITES_URL+"?v="+new Date().toISOString().slice(0,10), {cache:"no-cache"});
-    if(!Array.isArray(d.sites) || !d.sites.length) throw new Error("superchargers.json er tom eller ugyldig");
-    sitesCache = d.sites;
-    log(`${sitesCache.length} danske Superchargere indlæst`);
+/* ---------- Nærmeste ladere (Tesla, Circle K, OK) ----------
+   chargers.json ligger på samme server som appen, så din position sendes ingen steder hen. */
+const OPS = {tesla:"Tesla Supercharger", circlek:"Circle K", ok:"OK"};
+let dataCache=null;
+async function loadData(){
+  if(dataCache) return dataCache;
+  const d = await getJSON(DATA_URL+"?v="+Math.floor(Date.now()/600000), {cache:"no-cache"});
+  if(!Array.isArray(d.sites) || !d.prices) throw new Error("chargers.json er ugyldig");
+  const n = op => d.sites.filter(s=>s.op===op).length;
+  log(`chargers.json: Tesla ${n("tesla")}, Circle K ${n("circlek")}, OK ${n("ok")} (bygget ${d.built||"?"})`);
+  return dataCache = d;
+}
+const dmy = iso => iso ? iso.split("-").reverse().join(".") : "?";
+
+// Pris for en lokation – kun ud fra offentliggjorte tal; ukendt => null med forklaring
+function priceFor(site, P){
+  if(site.op==="tesla"){
+    return S.tesla==null
+      ? {p:null, note:"Pris ikke indtastet – aflæs den i Tesla-appen og skriv den under Indstillinger."}
+      : {p:S.tesla, note:`Pris indtastet af dig ${new Date(S.teslaSet).toLocaleString("da-DK",{day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"})} – ikke hentet automatisk.`};
   }
-  const sites = sitesCache.map(s=>({...s, km:distKm(pos,s)})).sort((a,b)=>a.km-b.km);
-  return sites[0];
+  if(site.op==="circlek"){
+    const c=P.circlek;
+    if(site.dc!==true && site.kw!=null && site.kw<50)
+      return {p:null, note:`Circle K offentliggør kun lynladerpris; denne lader er ${Math.round(site.kw)} kW.`};
+    return {p:c.lyn, note:`Circle K listepris for lynladning, ${dmy(c.date)} (circlek.dk).`};
+  }
+  // OK: vejledende pris pr. ladertype, bestemt af effekten i OpenStreetMap
+  const o=P.ok; let cls=null, why="";
+  if(site.kw!=null){ cls = site.kw<=22?"normal":site.kw<100?"hurtig":"lyn"; why=`${Math.round(site.kw)} kW`; }
+  else if(site.dc!==true){ cls="normal"; why="AC, effekt ikke angivet"; }
+  const names={normal:"normallader (3,7-22 kW)",hurtig:"hurtiglader (23-99 kW)",lyn:"lynlader (100+ kW)"};
+  if(!cls) return {p:null, note:`DC-lader uden angivet effekt – OK-pris er ${kr(o.hurtig)} (23-99 kW) eller ${kr(o.lyn)} (100+ kW).`};
+  return {p:o[cls], note:`OK vejledende pris for ${names[cls]} (${why}), ${dmy(o.date)} – kan afvige på lokationen.`};
+}
+
+async function nearestChargers(pos){
+  const d = await loadData();
+  const out=[];
+  for(const op of Object.keys(OPS)){
+    const near = d.sites.filter(s=>s.op===op).map(s=>({...s,km:distKm(pos,s)})).sort((a,b)=>a.km-b.km)[0];
+    if(near) out.push({...near, ...priceFor(near,d.prices)});
+  }
+  return out;
 }
 
 /* ---------- Hjemmepris (Strømligning) ---------- */
@@ -179,21 +211,21 @@ async function homeHour(){
 }
 
 /* ---------- Render ---------- */
-function render(home, tesla, pos){
+function render(home, chargers, pos){
   const opts=[];
   if(home) opts.push({key:"home",t:"Hjemme",d:home.prodName+" · "+home.supName,p:home.avg});
-  if(tesla) opts.push({key:"tesla",t:tesla.name,d:`${kr(tesla.km)} km væk · ${tesla.stalls??"?"} ladere`,p:S.tesla,
-                       warn: S.tesla==null ? "Pris ikke indtastet – aflæs den i Tesla-appen og skriv den under Indstillinger."
-                           : `Pris indtastet af dig ${new Date(S.teslaSet).toLocaleString("da-DK",{day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"})} – ikke hentet automatisk.`});
+  for(const c of chargers||[]) opts.push({key:c.op, t:`${OPS[c.op]} · ${c.name}`,
+      d:`${kr(c.km)} km væk`+(c.kw!=null?` · ${Math.round(c.kw)} kW`:"")+(c.stalls?` · ${c.stalls} ladepunkter`:""),
+      p:c.p, warn:c.note});
   const priced = opts.filter(o=>o.p!=null).sort((a,b)=>a.p-b.p);
   opts.sort((a,b)=>(a.p??Infinity)-(b.p??Infinity));
   const best = priced.length>1 ? priced[0] : null;
   if(best){
     $("hero").innerHTML = `<div class="lbl">Billigst lige nu</div><div class="name">${best.t}</div>
-      <div class="sub">${kr(best.p)} kr/kWh ${best.key==="home"?"i snit over næste time":"(din indtastede pris)"} · ${kr(priced[1].p-best.p)} kr/kWh billigere</div>`;
+      <div class="sub">${kr(best.p)} kr/kWh${best.key==="home"?" i snit over næste time":""} · ${kr(priced[1].p-best.p)} kr/kWh billigere end nr. 2</div>`;
   }else{
     $("hero").innerHTML = `<div class="lbl">Kan ikke sammenligne endnu</div>
-      <div class="sub">${!home?"Hjemmeprisen mangler.":tesla&&S.tesla==null?"Tesla-prisen er ikke indtastet.":"Venter på nærmeste Tesla-lader."}</div>`;
+      <div class="sub">${!home?"Hjemmeprisen mangler.":"Venter på ladere."}</div>`;
   }
   $("opts").innerHTML = opts.map(o=>`<div class="opt ${o===best?"best":""}">
      <div><div class="t">${o.t}</div><div class="d">${o.d}</div>${o.warn?`<div class="warn">${o.warn}</div>`:""}</div>
@@ -206,16 +238,16 @@ function render(home, tesla, pos){
 // Hjemmepris og Tesla hentes uafhængigt; skærmen opdateres så snart én af dem er klar
 async function run(){
   errs.length=0; $("errs").textContent=""; $("log").textContent=""; t0=performance.now();
-  let home=null, tesla=null, pos=null;
-  const show=()=>{ if(home||tesla) render(home,tesla,pos); };
+  let home=null, chargers=null, pos=null;
+  const show=()=>{ if(home||chargers) render(home,chargers,pos); };
   const homeP = homeHour().then(h=>{home=h; log("Hjemmepris klar"); show();})
     .catch(e=>err("Hjemmepris: "+e.message+(e instanceof TypeError?" (netværk/CORS blokeret)":"")));
   log("GPS: venter på position…");
-  const teslaP = gps().then(p=>{ pos=p; log(`GPS OK (±${Math.round(p.acc)} m)`); return nearestTesla(p); })
-    .then(t=>{tesla=t; log("Tesla-lader klar: "+t.name); show();})
-    .catch(e=>err((pos?"Tesla-lader: ":"")+e.message));
-  await Promise.all([homeP,teslaP]);
-  if(!home && !tesla) $("hero").innerHTML=`<div class="lbl">Ingen data</div>`;
+  const chP = gps().then(p=>{ pos=p; log(`GPS OK (±${Math.round(p.acc)} m)`); return nearestChargers(p); })
+    .then(c=>{chargers=c; log("Ladere klar"); show();})
+    .catch(e=>err((pos?"Ladere: ":"")+e.message));
+  await Promise.all([homeP,chP]);
+  if(!home && !chargers) $("hero").innerHTML=`<div class="lbl">Ingen data</div>`;
   log("Færdig");
 }
 
