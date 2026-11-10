@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 
 UA = {"User-Agent": "favetronics-ladepris (github.com/FAVetronics/Ladepris)"}
 def get(url, data=None):
-    with urllib.request.urlopen(urllib.request.Request(url, data=data, headers=UA), timeout=180) as r:
+    with urllib.request.urlopen(urllib.request.Request(url, data=data, headers=UA), timeout=120) as r:
         return r.read()
 def text(html):
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
@@ -38,13 +38,22 @@ nwr["amenity"="charging_station"](area.dk)->.cs;
 (nwr.cs["operator"~"circle ?k",i]; nwr.cs["brand"~"circle ?k",i];
  nwr.cs["operator"~"^ok$",i]; nwr.cs["brand"~"^ok$",i];);
 out center tags;"""
+try:
+    previous = json.load(open("chargers.json", encoding="utf-8"))
+except FileNotFoundError:
+    previous = None
+
+# Overpass er ustabil (502/timeout set 2026-11-10): flere forsøg, ellers genbrug forrige lokationer.
+import time
 osm = None
-for ep in ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter"]:
-    try:
-        osm = json.loads(get(ep, urllib.parse.urlencode({"data": Q}).encode())); break
-    except Exception as e:
-        print("Overpass fejl", ep, repr(e))
-if osm is None: die("ingen Overpass-server svarede")
+for attempt in range(3):
+    for ep in ["https://overpass-api.de/api/interpreter", "https://overpass.private.coffee/api/interpreter"]:
+        try:
+            osm = json.loads(get(ep, urllib.parse.urlencode({"data": Q}).encode())); break
+        except Exception as e:
+            print(f"Overpass fejl (forsøg {attempt+1})", ep, repr(e))
+    if osm: break
+    time.sleep(60)
 
 def kw_of(t):
     """Højeste effekt angivet i *:output-tags (kW), eller None."""
@@ -57,7 +66,7 @@ def kw_of(t):
     return best
 
 others = []
-for e in osm["elements"]:
+for e in (osm or {"elements": []})["elements"]:
     t = e.get("tags", {})
     lab = " ".join(t.get(k, "") for k in ("operator", "brand")).lower()
     op = "circlek" if re.search(r"circle ?k", lab) else "ok" if re.search(r"(^|\s)ok($|\s)", lab) else None
@@ -69,6 +78,10 @@ for e in osm["elements"]:
                    "lat": c["lat"], "lon": c["lon"], "kw": kw_of(t), "dc": dc,
                    "stalls": int(t["capacity"]) if t.get("capacity", "").isdigit() else None,
                    "osm": f"{e['type']}/{e['id']}"})
+if osm is None:
+    if not previous: die("ingen Overpass-server svarede, og der er ingen tidligere lokationer")
+    others = [x for x in previous["sites"] if x["op"] in ("circlek", "ok")]
+    print("Overpass utilgængelig – genbruger forrige OK/Circle K-lokationer")
 n_ck = sum(o["op"] == "circlek" for o in others); n_ok = len(others) - n_ck
 print(f"OSM: Circle K {n_ck}, OK {n_ok}")
 if n_ck < 50 or n_ok < 200: die("for få OSM-lokationer")
@@ -99,10 +112,8 @@ for v in [ck_price["lyn"], *okp.values()]:
 out = {"prices": {"circlek": ck_price, "ok": ok_price},
        "sources": {"tesla": TESLA_URL, "osm": "© OpenStreetMap-bidragydere (ODbL)"},
        "sites": sorted(tesla + others, key=lambda s: (s["op"], s["name"] or "", s["lat"]))}
-try:
-    old = json.load(open("chargers.json", encoding="utf-8")); old.pop("built", None)
-except FileNotFoundError:
-    old = None
+old = dict(previous) if previous else None
+if old: old.pop("built", None)
 if out != old:
     out["built"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     with open("chargers.json", "w", encoding="utf-8") as f:
