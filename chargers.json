@@ -1,5 +1,5 @@
 {
-"built": "2026-11-11T16:23:47+00:00",
+"built": "2026-11-11T22:55:23+00:00",
 "prices": {
 "circlek": {
 "date": "2026-11-09",
@@ -20,21 +20,21 @@
 {
 "dc": true,
 "kw": 400.0,
-"lat": 54.8266824,
-"lon": 9.3307609,
+"lat": 54.8268349,
+"lon": 9.3307903,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/13451215817",
+"osm": "way/1554582747",
 "stalls": 10
 },
 {
 "dc": true,
 "kw": 400.0,
-"lat": 54.8327313,
-"lon": 9.3322806,
+"lat": 54.8326782,
+"lon": 9.3319335,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/13450974053",
+"osm": "way/1554567857",
 "stalls": 10
 },
 {
@@ -49,13 +49,13 @@
 },
 {
 "dc": true,
-"kw": 350.0,
-"lat": 55.0979891,
-"lon": 14.7120169,
+"kw": 400.0,
+"lat": 55.0979504,
+"lon": 14.712128,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1182637128",
-"stalls": 4
+"stalls": 6
 },
 {
 "dc": null,
@@ -80,8 +80,8 @@
 {
 "dc": true,
 "kw": 300.0,
-"lat": 55.1657132,
-"lon": 11.9593635,
+"lat": 55.1656962,
+"lon": 11.9593701,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1172167593",
@@ -100,15 +100,15 @@
 {
 "dc": null,
 "kw": null,
-"lat": 55.2157221,
-"lon": 9.3750351,
+"lat": 55.2156302,
+"lon": 9.3754388,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/13451235289",
+"osm": "way/1563286897",
 "stalls": 6
 },
 {
-"dc": null,
+"dc": true,
 "kw": null,
 "lat": 55.2163752,
 "lon": 9.3721083,
@@ -120,12 +120,42 @@
 {
 "dc": true,
 "kw": 300.0,
+"lat": 55.2233274,
+"lon": 11.758402,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1558593532",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 400.0,
+"lat": 55.2408702,
+"lon": 9.2746964,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1551021040",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 300.0,
 "lat": 55.3092967,
 "lon": 10.8051266,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1313874146",
 "stalls": 6
+},
+{
+"dc": true,
+"kw": 50.0,
+"lat": 55.3518715,
+"lon": 8.7780566,
+"name": "Circle K",
+"op": "circlek",
+"osm": "relation/21912363",
+"stalls": 4
 },
 {
 "dc": true,
@@ -148,6 +178,26 @@
 "stalls": 4
 },
 {
+"dc": true,
+"kw": 400.0,
+"lat": 55.3871203,
+"lon": 11.3613094,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1558589103",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 400.0,
+"lat": 55.3877938,
+"lon": 11.3625327,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1184726857",
+"stalls": 10
+},
+{
 "dc": null,
 "kw": null,
 "lat": 55.3943622,
@@ -160,12 +210,32 @@
 {
 "dc": null,
 "kw": null,
-"lat": 55.4462332,
-"lon": 12.1728195,
+"lat": 55.4387575,
+"lon": 11.7932598,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/10139086259",
-"stalls": 2
+"osm": "node/14276096105",
+"stalls": null
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 55.4462517,
+"lon": 12.1728161,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1553207727",
+"stalls": 4
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.4515226,
+"lon": 10.6611641,
+"name": "Circle K",
+"op": "circlek",
+"osm": "node/14264030089",
+"stalls": null
 },
 {
 "dc": true,
@@ -179,7 +249,17 @@
 },
 {
 "dc": true,
-"kw": null,
+"kw": 400.0,
+"lat": 55.4626047,
+"lon": 8.4679097,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1546172344",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 400.0,
 "lat": 55.4627758,
 "lon": 8.4686458,
 "name": "Circle K",
@@ -200,6 +280,16 @@
 {
 "dc": true,
 "kw": 400.0,
+"lat": 55.4802504,
+"lon": 12.1870283,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1553253774",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 400.0,
 "lat": 55.4828185,
 "lon": 9.1479329,
 "name": "Circle K",
@@ -210,12 +300,22 @@
 {
 "dc": null,
 "kw": null,
-"lat": 55.4886021,
-"lon": 12.1618879,
+"lat": 55.4876098,
+"lon": 9.481237,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1558566768",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 400.0,
+"lat": 55.4885318,
+"lon": 12.1619272,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1226971799",
-"stalls": 4
+"stalls": 8
 },
 {
 "dc": true,
@@ -308,19 +408,19 @@
 "stalls": 4
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.6420353,
-"lon": 9.5575284,
+"dc": true,
+"kw": 400.0,
+"lat": 55.6417426,
+"lon": 9.55739,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/13430471807",
-"stalls": null
+"osm": "way/1531411480",
+"stalls": 12
 },
 {
 "dc": true,
-"kw": 150.0,
-"lat": 55.6454561,
+"kw": 400.0,
+"lat": 55.6454506,
 "lon": 12.4602171,
 "name": "Circle K",
 "op": "circlek",
@@ -359,13 +459,13 @@
 },
 {
 "dc": true,
-"kw": 300.0,
-"lat": 55.6547441,
-"lon": 12.4052109,
+"kw": 400.0,
+"lat": 55.6547515,
+"lon": 12.4051546,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1354968188",
-"stalls": 4
+"stalls": 6
 },
 {
 "dc": null,
@@ -405,6 +505,36 @@
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1202569710",
+"stalls": 6
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.7064628,
+"lon": 12.531654,
+"name": "Circle K",
+"op": "circlek",
+"osm": "node/14276875367",
+"stalls": null
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 55.7127568,
+"lon": 9.5225157,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1576322636",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 400.0,
+"lat": 55.7311299,
+"lon": 12.375363,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1490971989",
 "stalls": 6
 },
 {
@@ -458,6 +588,16 @@
 "stalls": null
 },
 {
+"dc": null,
+"kw": null,
+"lat": 55.8433357,
+"lon": 9.8476263,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/616967871",
+"stalls": null
+},
+{
 "dc": true,
 "kw": 400.0,
 "lat": 55.8436478,
@@ -476,6 +616,16 @@
 "op": "circlek",
 "osm": "way/1198005660",
 "stalls": 4
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.884972,
+"lon": 12.5431046,
+"name": "Circle K",
+"op": "circlek",
+"osm": "node/14276387660",
+"stalls": null
 },
 {
 "dc": null,
@@ -500,21 +650,31 @@
 {
 "dc": null,
 "kw": null,
-"lat": 55.9684067,
-"lon": 12.402769,
+"lat": 55.9684092,
+"lon": 12.4027591,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1490977937",
 "stalls": 4
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.9781739,
-"lon": 9.8704597,
+"dc": true,
+"kw": 400.0,
+"lat": 55.9781615,
+"lon": 9.870361,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/13566925271",
+"osm": "way/1544909326",
+"stalls": 8
+},
+{
+"dc": true,
+"kw": 400.0,
+"lat": 55.9781906,
+"lon": 9.864862,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1544903179",
 "stalls": 8
 },
 {
@@ -539,22 +699,22 @@
 },
 {
 "dc": true,
-"kw": 300.0,
+"kw": 400.0,
 "lat": 56.0682586,
-"lon": 9.9780507,
+"lon": 9.9782272,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1234140119",
-"stalls": 4
+"stalls": 8
 },
 {
 "dc": true,
 "kw": 400.0,
-"lat": 56.0690186,
-"lon": 9.9781161,
+"lat": 56.0690075,
+"lon": 9.9780498,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/13675254196",
+"osm": "way/434233297",
 "stalls": null
 },
 {
@@ -568,24 +728,14 @@
 "stalls": 4
 },
 {
-"dc": null,
-"kw": null,
-"lat": 56.1396709,
-"lon": 10.1826979,
-"name": "Circle K",
-"op": "circlek",
-"osm": "node/12847213596",
-"stalls": null
-},
-{
 "dc": true,
-"kw": 300.0,
+"kw": 400.0,
 "lat": 56.1396893,
-"lon": 10.1831366,
+"lon": 10.1829327,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1353561098",
-"stalls": 4
+"stalls": 6
 },
 {
 "dc": null,
@@ -620,11 +770,11 @@
 {
 "dc": true,
 "kw": 400.0,
-"lat": 56.3637634,
-"lon": 8.6123481,
+"lat": 56.363732,
+"lon": 8.6123266,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/13629151220",
+"osm": "way/1558241416",
 "stalls": 4
 },
 {
@@ -636,6 +786,16 @@
 "op": "circlek",
 "osm": "way/1492686222",
 "stalls": 4
+},
+{
+"dc": null,
+"kw": null,
+"lat": 56.4137315,
+"lon": 10.8850685,
+"name": "Circle K",
+"op": "circlek",
+"osm": "node/14263688262",
+"stalls": null
 },
 {
 "dc": true,
@@ -679,6 +839,26 @@
 },
 {
 "dc": true,
+"kw": 400.0,
+"lat": 56.7827786,
+"lon": 9.6947855,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1558319001",
+"stalls": 6
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 56.7828514,
+"lon": 9.6942306,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1393692880",
+"stalls": 6
+},
+{
+"dc": true,
 "kw": 300.0,
 "lat": 56.7928663,
 "lon": 8.853539,
@@ -690,31 +870,51 @@
 {
 "dc": null,
 "kw": null,
-"lat": 56.8426412,
-"lon": 9.7402122,
+"lat": 56.8426958,
+"lon": 9.7402939,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/13438557079",
+"osm": "way/1554496771",
 "stalls": null
 },
 {
-"dc": true,
-"kw": 300.0,
-"lat": 57.0391414,
-"lon": 9.9313595,
+"dc": null,
+"kw": null,
+"lat": 56.8431401,
+"lon": 9.7408065,
 "name": "Circle K",
 "op": "circlek",
-"osm": "node/9709622847",
-"stalls": 2
+"osm": "way/1554496764",
+"stalls": null
+},
+{
+"dc": null,
+"kw": null,
+"lat": 57.0391436,
+"lon": 9.9312774,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1563787996",
+"stalls": 6
 },
 {
 "dc": true,
 "kw": 300.0,
-"lat": 56.1861336,
-"lon": 9.5579334,
+"lat": 57.07092,
+"lon": 9.9262849,
+"name": "Circle K",
+"op": "circlek",
+"osm": "way/1535208503",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 56.1861617,
+"lon": 9.5579393,
 "name": "Circle K - Bregnevej Silkeborg",
 "op": "circlek",
-"osm": "node/13675578477",
+"osm": "way/1546918626",
 "stalls": 4
 },
 {
@@ -920,11 +1120,11 @@
 {
 "dc": null,
 "kw": null,
-"lat": 55.883117,
-"lon": 12.4978689,
+"lat": 55.883144,
+"lon": 12.4978775,
 "name": "Circle K Lynlader",
 "op": "circlek",
-"osm": "node/10312726319",
+"osm": "way/1545417872",
 "stalls": null
 },
 {
@@ -940,16 +1140,6 @@
 {
 "dc": true,
 "kw": 300.0,
-"lat": 56.7828514,
-"lon": 9.6942306,
-"name": "Circle K Nørager",
-"op": "circlek",
-"osm": "way/1393692880",
-"stalls": 6
-},
-{
-"dc": true,
-"kw": 300.0,
 "lat": 55.8450356,
 "lon": 9.7332966,
 "name": "Circle K Recharge City",
@@ -960,11 +1150,11 @@
 {
 "dc": true,
 "kw": 300.0,
-"lat": 55.6105569,
-"lon": 8.4939836,
+"lat": 55.61055,
+"lon": 8.4939683,
 "name": "Circle K Ribevej, Varde",
 "op": "circlek",
-"osm": "node/13673866505",
+"osm": "way/1545876022",
 "stalls": 4
 },
 {
@@ -1000,16 +1190,6 @@
 {
 "dc": true,
 "kw": 300.0,
-"lat": 55.3877493,
-"lon": 11.362399,
-"name": "Circle K Trafikcenter Slagelse",
-"op": "circlek",
-"osm": "way/1184726857",
-"stalls": 4
-},
-{
-"dc": true,
-"kw": 300.0,
 "lat": 56.1037342,
 "lon": 10.1454225,
 "name": "Circle K Tranbjerg J",
@@ -1020,12 +1200,12 @@
 {
 "dc": true,
 "kw": 300.0,
-"lat": 55.7227639,
-"lon": 9.5705798,
+"lat": 55.7227917,
+"lon": 9.5704895,
 "name": "Circle K Vejle",
 "op": "circlek",
-"osm": "node/9709795541",
-"stalls": 2
+"osm": "way/1056693094",
+"stalls": 10
 },
 {
 "dc": true,
@@ -1035,16 +1215,6 @@
 "name": "Circle K Østerbakken, Thisted",
 "op": "circlek",
 "osm": "way/1303143498",
-"stalls": 4
-},
-{
-"dc": true,
-"kw": 300.0,
-"lat": 55.2233197,
-"lon": 11.7583751,
-"name": "Cirkel K Havnegade, Næstved",
-"op": "circlek",
-"osm": "node/10137724923",
 "stalls": 4
 },
 {
@@ -1078,6 +1248,16 @@
 "stalls": 2
 },
 {
+"dc": null,
+"kw": null,
+"lat": 54.5803311,
+"lon": 11.9273982,
+"name": "OK",
+"op": "ok",
+"osm": "node/13965383101",
+"stalls": null
+},
+{
 "dc": true,
 "kw": 75.0,
 "lat": 54.6668507,
@@ -1088,14 +1268,14 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 54.749742,
-"lon": 10.6719205,
+"dc": true,
+"kw": 75.0,
+"lat": 54.7497229,
+"lon": 10.6719302,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664629905",
-"stalls": null
+"osm": "way/1545090547",
+"stalls": 2
 },
 {
 "dc": true,
@@ -1128,8 +1308,8 @@
 "stalls": 4
 },
 {
-"dc": null,
-"kw": null,
+"dc": true,
+"kw": 300.0,
 "lat": 54.8349638,
 "lon": 9.3421771,
 "name": "OK",
@@ -1155,6 +1335,16 @@
 "name": "OK",
 "op": "ok",
 "osm": "way/1507523936",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 54.9099183,
+"lon": 9.7726655,
+"name": "OK",
+"op": "ok",
+"osm": "way/1547928991",
 "stalls": 4
 },
 {
@@ -1199,6 +1389,16 @@
 },
 {
 "dc": true,
+"kw": 300.0,
+"lat": 54.9221315,
+"lon": 9.8104005,
+"name": "OK",
+"op": "ok",
+"osm": "way/1561297837",
+"stalls": 6
+},
+{
+"dc": true,
 "kw": 75.0,
 "lat": 54.9396786,
 "lon": 8.8544225,
@@ -1210,8 +1410,8 @@
 {
 "dc": true,
 "kw": 400.0,
-"lat": 54.9400318,
-"lon": 9.3802681,
+"lat": 54.9400657,
+"lon": 9.3803003,
 "name": "OK",
 "op": "ok",
 "osm": "way/1434228768",
@@ -1225,6 +1425,16 @@
 "name": "OK",
 "op": "ok",
 "osm": "node/13798522185",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 54.941178,
+"lon": 10.2600357,
+"name": "OK",
+"op": "ok",
+"osm": "node/13699663429",
 "stalls": 2
 },
 {
@@ -1358,14 +1568,14 @@
 "stalls": 2
 },
 {
-"dc": true,
-"kw": 400.0,
-"lat": 54.9975322,
-"lon": 12.0048918,
+"dc": null,
+"kw": 22.0,
+"lat": 54.9991779,
+"lon": 11.9962368,
 "name": "OK",
 "op": "ok",
-"osm": "way/1512684439",
-"stalls": 12
+"osm": "way/1532031240",
+"stalls": 4
 },
 {
 "dc": null,
@@ -1380,6 +1590,16 @@
 {
 "dc": true,
 "kw": 75.0,
+"lat": 55.0233803,
+"lon": 9.4205538,
+"name": "OK",
+"op": "ok",
+"osm": "way/1537721620",
+"stalls": 8
+},
+{
+"dc": true,
+"kw": 75.0,
 "lat": 55.0333442,
 "lon": 9.8156413,
 "name": "OK",
@@ -1388,14 +1608,14 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.0343065,
-"lon": 11.8773516,
+"dc": true,
+"kw": 75.0,
+"lat": 55.034298,
+"lon": 11.8773569,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664625032",
-"stalls": null
+"osm": "way/1546047366",
+"stalls": 2
 },
 {
 "dc": true,
@@ -1418,13 +1638,33 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.0607347,
-"lon": 10.5983259,
+"dc": true,
+"kw": 150.0,
+"lat": 55.060739,
+"lon": 10.5983254,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664635105",
+"osm": "node/13543831763",
+"stalls": null
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.0628802,
+"lon": 10.5893373,
+"name": "OK",
+"op": "ok",
+"osm": "way/1552918484",
+"stalls": 4
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.0633972,
+"lon": 10.5897415,
+"name": "OK",
+"op": "ok",
+"osm": "way/1552918476",
 "stalls": null
 },
 {
@@ -1448,10 +1688,10 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.0874813,
-"lon": 8.560569,
+"dc": true,
+"kw": 75.0,
+"lat": 55.0874856,
+"lon": 8.5606446,
 "name": "OK",
 "op": "ok",
 "osm": "node/12124034540",
@@ -1470,12 +1710,32 @@
 {
 "dc": null,
 "kw": null,
-"lat": 55.102247,
-"lon": 10.2505495,
+"lat": 55.096901,
+"lon": 10.2427018,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664492681",
-"stalls": null
+"osm": "way/1550487390",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 200.0,
+"lat": 55.0987088,
+"lon": 10.2433473,
+"name": "OK",
+"op": "ok",
+"osm": "way/1550489259",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.1022401,
+"lon": 10.250553,
+"name": "OK",
+"op": "ok",
+"osm": "way/1544870160",
+"stalls": 2
 },
 {
 "dc": true,
@@ -1485,6 +1745,16 @@
 "name": "OK",
 "op": "ok",
 "osm": "node/11803313316",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.141395,
+"lon": 10.3296321,
+"name": "OK",
+"op": "ok",
+"osm": "way/1550300351",
 "stalls": 2
 },
 {
@@ -1510,8 +1780,48 @@
 {
 "dc": null,
 "kw": null,
-"lat": 55.2371519,
-"lon": 10.4807678,
+"lat": 55.1782151,
+"lon": 10.5260117,
+"name": "OK",
+"op": "ok",
+"osm": "way/1550497425",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 11.0,
+"lat": 55.2110468,
+"lon": 11.7422391,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551439393",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 400.0,
+"lat": 55.2358047,
+"lon": 10.4901954,
+"name": "OK",
+"op": "ok",
+"osm": "way/1506896479",
+"stalls": 12
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.2361304,
+"lon": 9.4868702,
+"name": "OK",
+"op": "ok",
+"osm": "way/1558589212",
+"stalls": 4
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.2371226,
+"lon": 10.4807795,
 "name": "OK",
 "op": "ok",
 "osm": "node/12107790213",
@@ -1519,13 +1829,73 @@
 },
 {
 "dc": null,
-"kw": null,
-"lat": 55.2509542,
-"lon": 9.4961623,
+"kw": 22.0,
+"lat": 55.2449523,
+"lon": 9.2906241,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664517327",
-"stalls": null
+"osm": "way/1551029223",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 150.0,
+"lat": 55.2451964,
+"lon": 9.2920574,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551079060",
+"stalls": 8
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.2452952,
+"lon": 9.2886356,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551027063",
+"stalls": 4
+},
+{
+"dc": null,
+"kw": 11.0,
+"lat": 55.2483877,
+"lon": 9.3082263,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551083469",
+"stalls": 6
+},
+{
+"dc": null,
+"kw": 75.0,
+"lat": 55.2509297,
+"lon": 9.4961684,
+"name": "OK",
+"op": "ok",
+"osm": "way/1544364089",
+"stalls": 4
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.2519848,
+"lon": 9.4911584,
+"name": "OK",
+"op": "ok",
+"osm": "way/1557956009",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 11.0,
+"lat": 55.2521933,
+"lon": 9.3139466,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551096873",
+"stalls": 4
 },
 {
 "dc": true,
@@ -1578,13 +1948,13 @@
 "stalls": 2
 },
 {
-"dc": null,
+"dc": true,
 "kw": 75.0,
-"lat": 55.2744664,
-"lon": 9.9084612,
+"lat": 55.2744389,
+"lon": 9.9084509,
 "name": "OK",
 "op": "ok",
-"osm": "node/11279990065",
+"osm": "way/1561289801",
 "stalls": 2
 },
 {
@@ -1596,6 +1966,16 @@
 "op": "ok",
 "osm": "node/12815352985",
 "stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.2960608,
+"lon": 9.4246544,
+"name": "OK",
+"op": "ok",
+"osm": "node/14360173043",
+"stalls": null
 },
 {
 "dc": true,
@@ -1620,12 +2000,32 @@
 {
 "dc": null,
 "kw": null,
+"lat": 55.3091862,
+"lon": 10.5834179,
+"name": "OK",
+"op": "ok",
+"osm": "way/1550508226",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
 "lat": 55.311465,
 "lon": 12.0675737,
 "name": "OK",
 "op": "ok",
 "osm": "node/10138567571",
 "stalls": 2
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.3132824,
+"lon": 10.7924445,
+"name": "OK",
+"op": "ok",
+"osm": "way/1544785889",
+"stalls": 4
 },
 {
 "dc": true,
@@ -1645,7 +2045,7 @@
 "name": "OK",
 "op": "ok",
 "osm": "node/13401327680",
-"stalls": null
+"stalls": 2
 },
 {
 "dc": null,
@@ -1660,11 +2060,11 @@
 {
 "dc": true,
 "kw": 400.0,
-"lat": 55.3522302,
-"lon": 10.5640389,
+"lat": 55.3522366,
+"lon": 10.5640462,
 "name": "OK",
 "op": "ok",
-"osm": "node/13709455021",
+"osm": "way/1540118410",
 "stalls": 12
 },
 {
@@ -1676,6 +2076,36 @@
 "op": "ok",
 "osm": "way/1435618907",
 "stalls": 6
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.3742006,
+"lon": 10.369098,
+"name": "OK",
+"op": "ok",
+"osm": "way/1550567014",
+"stalls": 4
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.379176,
+"lon": 10.3971508,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551276055",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 750.0,
+"lat": 55.3832963,
+"lon": 9.5788272,
+"name": "OK",
+"op": "ok",
+"osm": "way/1518763567",
+"stalls": 2
 },
 {
 "dc": true,
@@ -1698,6 +2128,16 @@
 "stalls": 4
 },
 {
+"dc": null,
+"kw": null,
+"lat": 55.3923209,
+"lon": 10.4081737,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551258303",
+"stalls": 4
+},
+{
 "dc": true,
 "kw": 240.0,
 "lat": 55.4030571,
@@ -1706,6 +2146,16 @@
 "op": "ok",
 "osm": "way/1409585047",
 "stalls": 8
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.4074296,
+"lon": 10.3925365,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551273021",
+"stalls": 4
 },
 {
 "dc": null,
@@ -1720,12 +2170,52 @@
 {
 "dc": null,
 "kw": null,
-"lat": 55.4480548,
-"lon": 12.1652658,
+"lat": 55.4184702,
+"lon": 10.273499,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664637869",
-"stalls": null
+"osm": "way/1551054937",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.4277912,
+"lon": 10.4759934,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551474215",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.43091,
+"lon": 10.3353862,
+"name": "OK",
+"op": "ok",
+"osm": "way/1551959985",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.4440053,
+"lon": 10.188812,
+"name": "OK",
+"op": "ok",
+"osm": "way/1552218907",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 22.0,
+"lat": 55.448057,
+"lon": 12.1652197,
+"name": "OK",
+"op": "ok",
+"osm": "way/1544609133",
+"stalls": 2
 },
 {
 "dc": null,
@@ -1748,6 +2238,76 @@
 "stalls": 4
 },
 {
+"dc": null,
+"kw": null,
+"lat": 55.4604868,
+"lon": 9.8776805,
+"name": "OK",
+"op": "ok",
+"osm": "way/1550900342",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.4628462,
+"lon": 8.5839787,
+"name": "OK",
+"op": "ok",
+"osm": "way/1417721697",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.4655183,
+"lon": 10.0198241,
+"name": "OK",
+"op": "ok",
+"osm": "way/1557327187",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 55.4667734,
+"lon": 8.6992623,
+"name": "OK",
+"op": "ok",
+"osm": "way/1531235431",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.467095,
+"lon": 12.1114662,
+"name": "OK",
+"op": "ok",
+"osm": "way/1553038408",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.4684884,
+"lon": 8.6789641,
+"name": "OK",
+"op": "ok",
+"osm": "way/1531138797",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.4694267,
+"lon": 8.4582919,
+"name": "OK",
+"op": "ok",
+"osm": "way/1565587546",
+"stalls": 2
+},
+{
 "dc": true,
 "kw": 240.0,
 "lat": 55.4695801,
@@ -1760,11 +2320,31 @@
 {
 "dc": true,
 "kw": 75.0,
+"lat": 55.4708291,
+"lon": 9.1014395,
+"name": "OK",
+"op": "ok",
+"osm": "way/1564703632",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
 "lat": 55.4730807,
 "lon": 8.4345595,
 "name": "OK",
 "op": "ok",
 "osm": "node/11184348884",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.4772432,
+"lon": 9.1364598,
+"name": "OK",
+"op": "ok",
+"osm": "way/1564734789",
 "stalls": 2
 },
 {
@@ -1789,13 +2369,33 @@
 },
 {
 "dc": true,
-"kw": null,
-"lat": 55.4818674,
-"lon": 10.2510834,
+"kw": 240.0,
+"lat": 55.4816326,
+"lon": 12.174973,
 "name": "OK",
 "op": "ok",
-"osm": "node/11640415986",
+"osm": "node/14131500480",
 "stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.481854,
+"lon": 10.2510872,
+"name": "OK",
+"op": "ok",
+"osm": "way/1552224736",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.4829196,
+"lon": 12.1820352,
+"name": "OK",
+"op": "ok",
+"osm": "way/1553250066",
+"stalls": 5
 },
 {
 "dc": true,
@@ -1818,6 +2418,16 @@
 "stalls": 4
 },
 {
+"dc": null,
+"kw": 22.0,
+"lat": 55.4883966,
+"lon": 8.4454665,
+"name": "OK",
+"op": "ok",
+"osm": "way/1554388299",
+"stalls": 8
+},
+{
 "dc": true,
 "kw": 120.0,
 "lat": 55.4885125,
@@ -1826,6 +2436,36 @@
 "op": "ok",
 "osm": "way/1489577530",
 "stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.4906073,
+"lon": 9.968136,
+"name": "OK",
+"op": "ok",
+"osm": "way/1557276253",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.4910674,
+"lon": 8.4573516,
+"name": "OK",
+"op": "ok",
+"osm": "way/1554687214",
+"stalls": 6
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.4916417,
+"lon": 9.0196954,
+"name": "OK",
+"op": "ok",
+"osm": "way/1562276829",
+"stalls": 10
 },
 {
 "dc": null,
@@ -1888,6 +2528,26 @@
 "stalls": 2
 },
 {
+"dc": null,
+"kw": 11.0,
+"lat": 55.505128,
+"lon": 9.6909117,
+"name": "OK",
+"op": "ok",
+"osm": "way/1545454429",
+"stalls": 4
+},
+{
+"dc": null,
+"kw": 350.0,
+"lat": 55.5061282,
+"lon": 11.2864966,
+"name": "OK",
+"op": "ok",
+"osm": "node/14000896155",
+"stalls": null
+},
+{
 "dc": true,
 "kw": 240.0,
 "lat": 55.5067164,
@@ -1928,6 +2588,16 @@
 "stalls": null
 },
 {
+"dc": null,
+"kw": null,
+"lat": 55.5114236,
+"lon": 10.4001117,
+"name": "OK",
+"op": "ok",
+"osm": "node/14263868010",
+"stalls": null
+},
+{
 "dc": true,
 "kw": 320.0,
 "lat": 55.5122111,
@@ -1946,6 +2616,16 @@
 "op": "ok",
 "osm": "way/1479870012",
 "stalls": 12
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.5133196,
+"lon": 10.1712812,
+"name": "OK",
+"op": "ok",
+"osm": "way/1552259138",
+"stalls": 2
 },
 {
 "dc": true,
@@ -1968,14 +2648,34 @@
 "stalls": null
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.530967,
-"lon": 9.7153632,
+"dc": true,
+"kw": 240.0,
+"lat": 55.5309644,
+"lon": 9.7153582,
 "name": "OK",
 "op": "ok",
 "osm": "way/1466585741",
 "stalls": 4
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.5326082,
+"lon": 9.7760212,
+"name": "OK",
+"op": "ok",
+"osm": "way/1557277911",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.5375721,
+"lon": 9.6269045,
+"name": "OK",
+"op": "ok",
+"osm": "way/1532961081",
+"stalls": 2
 },
 {
 "dc": true,
@@ -2029,12 +2729,22 @@
 },
 {
 "dc": true,
-"kw": 300.0,
-"lat": 55.585124,
-"lon": 12.258535,
+"kw": 75.0,
+"lat": 55.5845961,
+"lon": 11.6546246,
 "name": "OK",
 "op": "ok",
-"osm": "node/13192522359",
+"osm": "way/1486286830",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 55.5850986,
+"lon": 12.258531,
+"name": "OK",
+"op": "ok",
+"osm": "way/1575930996",
 "stalls": null
 },
 {
@@ -2088,6 +2798,16 @@
 "stalls": 2
 },
 {
+"dc": true,
+"kw": 75.0,
+"lat": 55.6323738,
+"lon": 8.4831432,
+"name": "OK",
+"op": "ok",
+"osm": "node/14092903669",
+"stalls": 2
+},
+{
 "dc": null,
 "kw": 22.0,
 "lat": 55.6384421,
@@ -2099,12 +2819,32 @@
 },
 {
 "dc": true,
-"kw": null,
-"lat": 55.6403612,
-"lon": 9.5632631,
+"kw": 400.0,
+"lat": 55.6402178,
+"lon": 9.5630441,
 "name": "OK",
 "op": "ok",
-"osm": "node/13430471808",
+"osm": "way/1532834435",
+"stalls": 10
+},
+{
+"dc": true,
+"kw": 750.0,
+"lat": 55.6474874,
+"lon": 12.4166757,
+"name": "OK",
+"op": "ok",
+"osm": "way/1541012096",
+"stalls": 8
+},
+{
+"dc": true,
+"kw": 120.0,
+"lat": 55.6482853,
+"lon": 12.416071,
+"name": "OK",
+"op": "ok",
+"osm": "way/1541011259",
 "stalls": 10
 },
 {
@@ -2128,13 +2868,63 @@
 "stalls": 6
 },
 {
+"dc": null,
+"kw": 22.0,
+"lat": 55.652305,
+"lon": 12.316097,
+"name": "OK",
+"op": "ok",
+"osm": "node/14337804001",
+"stalls": 6
+},
+{
 "dc": true,
 "kw": 75.0,
-"lat": 55.6535209,
-"lon": 12.4055096,
+"lat": 55.6524799,
+"lon": 12.3173626,
+"name": "OK",
+"op": "ok",
+"osm": "node/14337804002",
+"stalls": 6
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.6527306,
+"lon": 8.8158869,
+"name": "OK",
+"op": "ok",
+"osm": "way/1531255786",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.6530657,
+"lon": 12.6150093,
+"name": "OK",
+"op": "ok",
+"osm": "node/14004801796",
+"stalls": 10
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.6535063,
+"lon": 12.4054156,
 "name": "OK",
 "op": "ok",
 "osm": "way/1492720970",
+"stalls": 6
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 55.6544107,
+"lon": 12.3958632,
+"name": "OK",
+"op": "ok",
+"osm": "way/1540111534",
 "stalls": 6
 },
 {
@@ -2160,12 +2950,12 @@
 {
 "dc": true,
 "kw": 240.0,
-"lat": 55.6586588,
-"lon": 12.3915799,
+"lat": 55.6586659,
+"lon": 12.3915526,
 "name": "OK",
 "op": "ok",
-"osm": "node/12539624759",
-"stalls": 4
+"osm": "way/1544841756",
+"stalls": 6
 },
 {
 "dc": null,
@@ -2199,9 +2989,9 @@
 },
 {
 "dc": null,
-"kw": null,
-"lat": 55.6646827,
-"lon": 12.5404989,
+"kw": 22.0,
+"lat": 55.6646846,
+"lon": 12.5405065,
 "name": "OK",
 "op": "ok",
 "osm": "way/1475219037",
@@ -2228,6 +3018,16 @@
 "stalls": null
 },
 {
+"dc": null,
+"kw": 22.0,
+"lat": 55.6718541,
+"lon": 12.4956308,
+"name": "OK",
+"op": "ok",
+"osm": "way/1544800759",
+"stalls": 4
+},
+{
 "dc": true,
 "kw": 50.0,
 "lat": 55.6947035,
@@ -2238,14 +3038,54 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.7010324,
-"lon": 12.5420639,
+"dc": true,
+"kw": 75.0,
+"lat": 55.6959719,
+"lon": 9.5242818,
 "name": "OK",
 "op": "ok",
-"osm": "way/1493025015",
-"stalls": 8
+"osm": "way/1544848326",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.6992343,
+"lon": 12.470094,
+"name": "OK",
+"op": "ok",
+"osm": "way/1541002714",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.7014554,
+"lon": 12.5422228,
+"name": "OK",
+"op": "ok",
+"osm": "way/1537261485",
+"stalls": 10
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.7041244,
+"lon": 11.7066486,
+"name": "OK",
+"op": "ok",
+"osm": "way/1570471153",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.7041432,
+"lon": 11.706672,
+"name": "OK",
+"op": "ok",
+"osm": "node/13914022939",
+"stalls": 2
 },
 {
 "dc": true,
@@ -2256,6 +3096,16 @@
 "op": "ok",
 "osm": "way/1479669911",
 "stalls": 6
+},
+{
+"dc": true,
+"kw": 240.0,
+"lat": 55.7060671,
+"lon": 9.5293164,
+"name": "OK",
+"op": "ok",
+"osm": "way/1545376092",
+"stalls": 2
 },
 {
 "dc": null,
@@ -2275,6 +3125,16 @@
 "name": "OK",
 "op": "ok",
 "osm": "node/12222163914",
+"stalls": 10
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.7091911,
+"lon": 12.5856534,
+"name": "OK",
+"op": "ok",
+"osm": "way/1574764278",
 "stalls": 10
 },
 {
@@ -2300,12 +3160,32 @@
 {
 "dc": null,
 "kw": null,
-"lat": 55.7131004,
-"lon": 12.4308667,
+"lat": 55.7130832,
+"lon": 12.4308642,
 "name": "OK",
 "op": "ok",
-"osm": "node/13676253491",
+"osm": "way/1537397591",
 "stalls": 20
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.7177548,
+"lon": 11.7046465,
+"name": "OK",
+"op": "ok",
+"osm": "way/1573779154",
+"stalls": 6
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 55.7179844,
+"lon": 8.6112105,
+"name": "OK",
+"op": "ok",
+"osm": "way/1574229791",
+"stalls": 2
 },
 {
 "dc": null,
@@ -2448,8 +3328,8 @@
 "stalls": 4
 },
 {
-"dc": null,
-"kw": null,
+"dc": true,
+"kw": 75.0,
 "lat": 55.8690347,
 "lon": 12.3538923,
 "name": "OK",
@@ -2458,14 +3338,54 @@
 "stalls": 4
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.9202854,
-"lon": 12.2952837,
+"dc": true,
+"kw": 240.0,
+"lat": 55.8769305,
+"lon": 9.8094168,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664702933",
-"stalls": null
+"osm": "way/1570958780",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.9127544,
+"lon": 10.2539766,
+"name": "OK",
+"op": "ok",
+"osm": "way/1545856548",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.916863,
+"lon": 8.5177147,
+"name": "OK",
+"op": "ok",
+"osm": "way/1560642162",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 11.0,
+"lat": 55.9202812,
+"lon": 12.2952967,
+"name": "OK",
+"op": "ok",
+"osm": "way/1544883124",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 11.0,
+"lat": 55.921107,
+"lon": 12.2851794,
+"name": "OK",
+"op": "ok",
+"osm": "way/1544357100",
+"stalls": 6
 },
 {
 "dc": true,
@@ -2500,12 +3420,22 @@
 {
 "dc": true,
 "kw": 240.0,
-"lat": 55.9295213,
-"lon": 11.657772,
+"lat": 55.9295101,
+"lon": 11.6577686,
 "name": "OK",
 "op": "ok",
-"osm": "node/13319421562",
+"osm": "way/1545878560",
 "stalls": 4
+},
+{
+"dc": true,
+"kw": 240.0,
+"lat": 55.9381998,
+"lon": 9.9572844,
+"name": "OK",
+"op": "ok",
+"osm": "way/1564715206",
+"stalls": 2
 },
 {
 "dc": true,
@@ -2528,14 +3458,14 @@
 "stalls": 4
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.9655841,
-"lon": 12.4103697,
+"dc": true,
+"kw": 50.0,
+"lat": 55.9655732,
+"lon": 12.4103431,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664670549",
-"stalls": null
+"osm": "way/1544880294",
+"stalls": 4
 },
 {
 "dc": null,
@@ -2558,24 +3488,24 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.97804,
-"lon": 9.87046,
+"dc": true,
+"kw": 400.0,
+"lat": 55.9779569,
+"lon": 9.8704001,
 "name": "OK",
 "op": "ok",
-"osm": "node/13566925270",
+"osm": "way/1544909325",
 "stalls": 8
 },
 {
-"dc": null,
-"kw": null,
-"lat": 55.978451,
-"lon": 9.8648036,
+"dc": true,
+"kw": 400.0,
+"lat": 55.9786665,
+"lon": 9.8647969,
 "name": "OK",
 "op": "ok",
-"osm": "node/13675554569",
-"stalls": 16
+"osm": "way/1544903180",
+"stalls": 8
 },
 {
 "dc": true,
@@ -2628,23 +3558,53 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 56.0374233,
-"lon": 10.0831828,
+"dc": true,
+"kw": 75.0,
+"lat": 56.037442,
+"lon": 10.0832783,
 "name": "OK",
 "op": "ok",
 "osm": "node/11711915436",
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 56.0443386,
-"lon": 10.0816123,
+"dc": true,
+"kw": 75.0,
+"lat": 56.0443375,
+"lon": 10.0816553,
 "name": "OK",
 "op": "ok",
-"osm": "node/11711915460",
+"osm": "way/1535143746",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 56.0612894,
+"lon": 9.9847487,
+"name": "OK",
+"op": "ok",
+"osm": "way/1545425028",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 56.0628545,
+"lon": 12.2828632,
+"name": "OK",
+"op": "ok",
+"osm": "way/1545408735",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 56.0852237,
+"lon": 10.1194301,
+"name": "OK",
+"op": "ok",
+"osm": "way/1569958715",
 "stalls": 2
 },
 {
@@ -2668,19 +3628,39 @@
 "stalls": null
 },
 {
-"dc": null,
-"kw": null,
-"lat": 56.1191492,
-"lon": 12.317597,
+"dc": true,
+"kw": 300.0,
+"lat": 56.1045378,
+"lon": 8.2560763,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664669278",
+"osm": "way/1570808181",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 56.114898,
+"lon": 10.133986,
+"name": "OK",
+"op": "ok",
+"osm": "node/14325568042",
 "stalls": null
 },
 {
 "dc": true,
+"kw": 75.0,
+"lat": 56.1191387,
+"lon": 12.3175951,
+"name": "OK",
+"op": "ok",
+"osm": "way/1545422340",
+"stalls": 4
+},
+{
+"dc": true,
 "kw": 400.0,
-"lat": 56.1216989,
+"lat": 56.1216938,
 "lon": 9.1735856,
 "name": "OK",
 "op": "ok",
@@ -2695,6 +3675,26 @@
 "name": "OK",
 "op": "ok",
 "osm": "node/13876506836",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 400.0,
+"lat": 56.1299305,
+"lon": 9.5619131,
+"name": "OK",
+"op": "ok",
+"osm": "node/14222206847",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 400.0,
+"lat": 56.1299357,
+"lon": 9.5620171,
+"name": "OK",
+"op": "ok",
+"osm": "node/14222206846",
 "stalls": 2
 },
 {
@@ -2719,6 +3719,16 @@
 },
 {
 "dc": true,
+"kw": 300.0,
+"lat": 56.1420073,
+"lon": 10.2313825,
+"name": "OK",
+"op": "ok",
+"osm": "way/1528411758",
+"stalls": 4
+},
+{
+"dc": true,
 "kw": 75.0,
 "lat": 56.1451644,
 "lon": 8.960804,
@@ -2730,8 +3740,8 @@
 {
 "dc": true,
 "kw": 300.0,
-"lat": 56.1462636,
-"lon": 9.9186133,
+"lat": 56.1462631,
+"lon": 9.9186125,
 "name": "OK",
 "op": "ok",
 "osm": "way/1458439412",
@@ -2758,8 +3768,18 @@
 "stalls": 6
 },
 {
+"dc": true,
+"kw": 400.0,
+"lat": 56.158671,
+"lon": 10.0682418,
+"name": "OK",
+"op": "ok",
+"osm": "way/1571564669",
+"stalls": 8
+},
+{
 "dc": null,
-"kw": null,
+"kw": 22.0,
 "lat": 56.1587242,
 "lon": 10.0680326,
 "name": "OK",
@@ -2788,14 +3808,24 @@
 "stalls": null
 },
 {
-"dc": null,
-"kw": null,
-"lat": 56.1853607,
-"lon": 9.542248,
+"dc": true,
+"kw": 75.0,
+"lat": 56.1853688,
+"lon": 9.5422366,
 "name": "OK",
 "op": "ok",
 "osm": "way/1384640870",
-"stalls": null
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 56.1879708,
+"lon": 9.5767726,
+"name": "OK",
+"op": "ok",
+"osm": "way/1526719734",
+"stalls": 2
 },
 {
 "dc": true,
@@ -2818,6 +3848,16 @@
 "stalls": 14
 },
 {
+"dc": true,
+"kw": 240.0,
+"lat": 56.2006519,
+"lon": 9.0199569,
+"name": "OK",
+"op": "ok",
+"osm": "way/1531555992",
+"stalls": 2
+},
+{
 "dc": null,
 "kw": null,
 "lat": 56.2051489,
@@ -2829,19 +3869,19 @@
 },
 {
 "dc": null,
-"kw": null,
-"lat": 56.2340706,
-"lon": 10.3048773,
+"kw": 22.0,
+"lat": 56.2340663,
+"lon": 10.3048683,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664612467",
-"stalls": null
+"osm": "node/13428412999",
+"stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 56.2371079,
-"lon": 10.2341509,
+"dc": true,
+"kw": 75.0,
+"lat": 56.237106,
+"lon": 10.2341564,
 "name": "OK",
 "op": "ok",
 "osm": "way/1381531120",
@@ -2858,14 +3898,24 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 56.2751136,
-"lon": 8.3235992,
+"dc": true,
+"kw": 75.0,
+"lat": 56.2626425,
+"lon": 10.3016044,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664579817",
-"stalls": null
+"osm": "node/14152953897",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 240.0,
+"lat": 56.2751135,
+"lon": 8.323589,
+"name": "OK",
+"op": "ok",
+"osm": "way/149788228",
+"stalls": 2
 },
 {
 "dc": true,
@@ -2885,6 +3935,16 @@
 "name": "OK",
 "op": "ok",
 "osm": "way/1377150223",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 56.3070395,
+"lon": 9.1633424,
+"name": "OK",
+"op": "ok",
+"osm": "node/14204554655",
 "stalls": 2
 },
 {
@@ -2928,10 +3988,10 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": 99.0,
-"lat": 56.3163665,
-"lon": 10.318516,
+"dc": true,
+"kw": 75.0,
+"lat": 56.3163755,
+"lon": 10.3185038,
 "name": "OK",
 "op": "ok",
 "osm": "node/13319027498",
@@ -2958,14 +4018,14 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 56.3527861,
-"lon": 8.6059285,
+"dc": true,
+"kw": 240.0,
+"lat": 56.3528164,
+"lon": 8.6059064,
 "name": "OK",
 "op": "ok",
-"osm": "node/13664172742",
-"stalls": null
+"osm": "way/1544752191",
+"stalls": 2
 },
 {
 "dc": true,
@@ -2976,6 +4036,16 @@
 "op": "ok",
 "osm": "way/1319745778",
 "stalls": 8
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 56.3907304,
+"lon": 9.7937588,
+"name": "OK",
+"op": "ok",
+"osm": "node/13905889159",
+"stalls": 2
 },
 {
 "dc": true,
@@ -3010,12 +4080,12 @@
 {
 "dc": true,
 "kw": 200.0,
-"lat": 56.444443,
-"lon": 9.3895663,
+"lat": 56.4444347,
+"lon": 9.389545,
 "name": "OK",
 "op": "ok",
-"osm": "node/13675672239",
-"stalls": null
+"osm": "way/1559382639",
+"stalls": 4
 },
 {
 "dc": true,
@@ -3049,13 +4119,53 @@
 },
 {
 "dc": true,
+"kw": 75.0,
+"lat": 56.5673586,
+"lon": 9.0329781,
+"name": "OK",
+"op": "ok",
+"osm": "way/1558232882",
+"stalls": 2
+},
+{
+"dc": true,
 "kw": 240.0,
-"lat": 56.5694841,
-"lon": 8.9980269,
+"lat": 56.5694744,
+"lon": 8.9980251,
 "name": "OK",
 "op": "ok",
 "osm": "way/1382116657",
 "stalls": 8
+},
+{
+"dc": true,
+"kw": null,
+"lat": 56.585294,
+"lon": 9.0286855,
+"name": "OK",
+"op": "ok",
+"osm": "way/1532671642",
+"stalls": 6
+},
+{
+"dc": null,
+"kw": null,
+"lat": 56.5863834,
+"lon": 9.7604847,
+"name": "OK",
+"op": "ok",
+"osm": "way/1574033791",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 56.6169139,
+"lon": 8.1761489,
+"name": "OK",
+"op": "ok",
+"osm": "way/1562997349",
+"stalls": 2
 },
 {
 "dc": true,
@@ -3120,12 +4230,12 @@
 {
 "dc": true,
 "kw": 400.0,
-"lat": 56.7834429,
-"lon": 9.691253,
+"lat": 56.7838254,
+"lon": 9.691116,
 "name": "OK",
 "op": "ok",
-"osm": "node/13108672433",
-"stalls": null
+"osm": "way/1558319015",
+"stalls": 10
 },
 {
 "dc": true,
@@ -3155,7 +4265,7 @@
 "name": "OK",
 "op": "ok",
 "osm": "way/1305346704",
-"stalls": 4
+"stalls": 6
 },
 {
 "dc": true,
@@ -3175,6 +4285,16 @@
 "name": "OK",
 "op": "ok",
 "osm": "node/13830688901",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 56.9274326,
+"lon": 8.5049758,
+"name": "OK",
+"op": "ok",
+"osm": "node/14249708556",
 "stalls": 2
 },
 {
@@ -3216,6 +4336,16 @@
 "op": "ok",
 "osm": "node/11817215585",
 "stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 57.0167345,
+"lon": 9.9942795,
+"name": "OK",
+"op": "ok",
+"osm": "way/1557595761",
+"stalls": 8
 },
 {
 "dc": null,
@@ -3268,14 +4398,34 @@
 "stalls": 2
 },
 {
-"dc": null,
-"kw": null,
-"lat": 57.0700283,
-"lon": 9.9451315,
+"dc": true,
+"kw": 75.0,
+"lat": 57.0661978,
+"lon": 10.1305742,
+"name": "OK",
+"op": "ok",
+"osm": "way/1567460540",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 57.0700231,
+"lon": 9.9451311,
 "name": "OK",
 "op": "ok",
 "osm": "way/1427126457",
 "stalls": 4
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 57.0859605,
+"lon": 8.9950614,
+"name": "OK",
+"op": "ok",
+"osm": "way/1567543857",
+"stalls": 2
 },
 {
 "dc": null,
@@ -3369,6 +4519,26 @@
 },
 {
 "dc": true,
+"kw": 75.0,
+"lat": 57.3317392,
+"lon": 10.5045944,
+"name": "OK",
+"op": "ok",
+"osm": "way/1536075031",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 57.3333884,
+"lon": 10.5159631,
+"name": "OK",
+"op": "ok",
+"osm": "node/13994106949",
+"stalls": 4
+},
+{
+"dc": true,
 "kw": 240.0,
 "lat": 57.3682346,
 "lon": 9.7126169,
@@ -3395,6 +4565,26 @@
 "name": "OK",
 "op": "ok",
 "osm": "node/12474231125",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 240.0,
+"lat": 57.4565772,
+"lon": 10.0105574,
+"name": "OK",
+"op": "ok",
+"osm": "way/1532864901",
+"stalls": 4
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 57.4613682,
+"lon": 10.520225,
+"name": "OK",
+"op": "ok",
+"osm": "node/14302770485",
 "stalls": 2
 },
 {
@@ -3429,6 +4619,16 @@
 },
 {
 "dc": null,
+"kw": 22.0,
+"lat": 57.5455502,
+"lon": 10.1988644,
+"name": "OK",
+"op": "ok",
+"osm": "node/14298773129",
+"stalls": 2
+},
+{
+"dc": null,
 "kw": null,
 "lat": 57.5808126,
 "lon": 9.968483,
@@ -3459,6 +4659,16 @@
 },
 {
 "dc": true,
+"kw": 75.0,
+"lat": 57.7272835,
+"lon": 10.5213109,
+"name": "OK",
+"op": "ok",
+"osm": "node/12027493970",
+"stalls": 2
+},
+{
+"dc": true,
 "kw": 400.0,
 "lat": 56.7894946,
 "lon": 8.8279111,
@@ -3479,6 +4689,36 @@
 },
 {
 "dc": true,
+"kw": 300.0,
+"lat": 55.8460358,
+"lon": 9.7352487,
+"name": "OK - Horsens Recharge City - Café Gnist",
+"op": "ok",
+"osm": "way/1383975934",
+"stalls": 6
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 55.8458609,
+"lon": 9.7349091,
+"name": "OK - Horsens Recharge City - Carl's Jr.",
+"op": "ok",
+"osm": "way/1546668672",
+"stalls": 2
+},
+{
+"dc": true,
+"kw": 300.0,
+"lat": 55.8464395,
+"lon": 9.7361044,
+"name": "OK - Horsens Recharge City - Four Points Flex by Sheraton",
+"op": "ok",
+"osm": "way/1546668673",
+"stalls": 10
+},
+{
+"dc": true,
 "kw": 175.0,
 "lat": 54.780063,
 "lon": 11.4785231,
@@ -3496,6 +4736,16 @@
 "op": "ok",
 "osm": "way/1193835758",
 "stalls": 4
+},
+{
+"dc": true,
+"kw": 400.0,
+"lat": 54.9975303,
+"lon": 12.0048859,
+"name": "OK - Vordingborg, Højgaardsvej",
+"op": "ok",
+"osm": "way/1512684439",
+"stalls": 12
 },
 {
 "dc": null,
@@ -3558,13 +4808,33 @@
 "stalls": 2
 },
 {
+"dc": null,
+"kw": 22.0,
+"lat": 55.2366146,
+"lon": 10.7415775,
+"name": "OK Frørup, Skolevej",
+"op": "ok",
+"osm": "node/13844310474",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": 22.0,
+"lat": 55.2371183,
+"lon": 10.7393025,
+"name": "OK Frørup, Sportsvænget",
+"op": "ok",
+"osm": "node/13844310473",
+"stalls": 2
+},
+{
 "dc": true,
 "kw": 300.0,
-"lat": 55.2459835,
-"lon": 9.3977786,
+"lat": 55.2459673,
+"lon": 9.3977802,
 "name": "OK Hammelev Lynlader",
 "op": "ok",
-"osm": "node/11447465884",
+"osm": "way/1536940368",
 "stalls": 12
 },
 {
@@ -3576,16 +4846,6 @@
 "op": "ok",
 "osm": "way/1497454421",
 "stalls": 6
-},
-{
-"dc": true,
-"kw": 300.0,
-"lat": 55.8460359,
-"lon": 9.7352511,
-"name": "OK Horsens Recharge City",
-"op": "ok",
-"osm": "way/1383975934",
-"stalls": 18
 },
 {
 "dc": true,
@@ -3658,16 +4918,6 @@
 "stalls": 4
 },
 {
-"dc": true,
-"kw": 75.0,
-"lat": 55.4628462,
-"lon": 8.5839787,
-"name": "OK Hurtiglader",
-"op": "ok",
-"osm": "way/1417721697",
-"stalls": 2
-},
-{
 "dc": null,
 "kw": 11.0,
 "lat": 56.1537253,
@@ -3676,6 +4926,26 @@
 "op": "ok",
 "osm": "node/5233357504",
 "stalls": 2
+},
+{
+"dc": true,
+"kw": 75.0,
+"lat": 55.5037181,
+"lon": 11.2895093,
+"name": "OK Høng Centervej",
+"op": "ok",
+"osm": "way/1536951956",
+"stalls": 2
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.5061568,
+"lon": 11.2864514,
+"name": "OK Høng Slagelsevej",
+"op": "ok",
+"osm": "way/1536947907",
+"stalls": null
 },
 {
 "dc": true,
@@ -3696,6 +4966,26 @@
 "op": "ok",
 "osm": "node/13598609803",
 "stalls": 2
+},
+{
+"dc": true,
+"kw": 400.0,
+"lat": 55.5625194,
+"lon": 12.2307654,
+"name": "OK Karlslunde V",
+"op": "ok",
+"osm": "way/1575108479",
+"stalls": null
+},
+{
+"dc": true,
+"kw": 400.0,
+"lat": 55.5591498,
+"lon": 12.230032,
+"name": "OK Karlslunde Ø",
+"op": "ok",
+"osm": "way/1575108480",
+"stalls": 14
 },
 {
 "dc": true,
@@ -3770,8 +5060,8 @@
 {
 "dc": true,
 "kw": 300.0,
-"lat": 55.4131432,
-"lon": 10.0572109,
+"lat": 55.4131758,
+"lon": 10.0573855,
 "name": "OK Lynlader",
 "op": "ok",
 "osm": "way/1154361710",
@@ -3801,7 +5091,7 @@
 "dc": true,
 "kw": 75.0,
 "lat": 56.0906365,
-"lon": 8.2399203,
+"lon": 8.2399256,
 "name": "OK Ringkøbing, SuperBrugsen",
 "op": "ok",
 "osm": "way/1225996940",
@@ -3898,6 +5188,16 @@
 "stalls": 4
 },
 {
+"dc": true,
+"kw": 300.0,
+"lat": 55.663138,
+"lon": 9.4074799,
+"name": "OK Ødsted",
+"op": "ok",
+"osm": "way/1530486646",
+"stalls": 2
+},
+{
 "dc": null,
 "kw": 75.0,
 "lat": 55.9226891,
@@ -3906,6 +5206,16 @@
 "op": "ok",
 "osm": "node/12762836952",
 "stalls": 6
+},
+{
+"dc": null,
+"kw": null,
+"lat": 55.6901624,
+"lon": 12.5306413,
+"name": "Ok",
+"op": "ok",
+"osm": "node/13032273701",
+"stalls": 4
 },
 {
 "dc": true,
