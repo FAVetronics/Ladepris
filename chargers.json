@@ -1,5 +1,5 @@
 {
-"built": "2026-11-14T23:12:49+00:00",
+"built": "2026-11-15T11:17:19+00:00",
 "prices": {
 "circlek": {
 "date": "2026-11-09",
@@ -868,24 +868,24 @@
 "stalls": 4
 },
 {
-"dc": null,
-"kw": null,
+"dc": true,
+"kw": 400.0,
 "lat": 56.8426958,
 "lon": 9.7402939,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1554496771",
-"stalls": null
+"stalls": 2
 },
 {
-"dc": null,
-"kw": null,
+"dc": true,
+"kw": 400.0,
 "lat": 56.8431401,
 "lon": 9.7408065,
 "name": "Circle K",
 "op": "circlek",
 "osm": "way/1554496764",
-"stalls": null
+"stalls": 10
 },
 {
 "dc": null,
